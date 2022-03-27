@@ -4,9 +4,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.catfisher.multiarielle.model.LocalModel;
 import com.catfisher.multiarielle.model.Model;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class LocalScreen implements Screen {
 
     final MultiArielle game;
@@ -17,7 +18,7 @@ public class LocalScreen implements Screen {
         this.game = game;
         this.camera = new OrthographicCamera(640, 640);
 
-        this.localModel = new LocalModel(game.getHeroSprites());
+        this.localModel = game.getLocalModel();
     }
 
     @Override

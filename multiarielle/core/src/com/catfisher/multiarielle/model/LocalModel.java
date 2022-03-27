@@ -1,16 +1,31 @@
 package com.catfisher.multiarielle.model;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.catfisher.multiarielle.clientServer.ModelClient;
+import com.catfisher.multiarielle.clientServer.ModelServer;
+import com.catfisher.multiarielle.controller.EventConsumer;
+import com.catfisher.multiarielle.controller.event.Event;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
-import java.util.Arrays;
+@Log4j2
+public class LocalModel implements Model, EventConsumer<Boolean> {
+    @Getter
+    private final AbsoluteModel localModel = new AbsoluteModel();
+    private ModelClient modelClient;
 
-@RequiredArgsConstructor
-public class LocalModel implements Model {
-    private final TextureRegion[][] heroSprite;
+    public void associateClient(ModelClient client) {
+        this.modelClient = client;
+    }
+
+    @Override
+    public Boolean consume(Event e) {
+        log.info("localModel received event from keyboard {}", e);
+        return localModel.consume(e) && modelClient.forwardEventToServer(e);
+    }
 
     @Override
     public Iterable<SpritePlacement> getSpritePlacements(int startX, int startY, int endX, int endY) {
-        return Arrays.asList(new SpritePlacement(10, 10, heroSprite[0][0]));
+        return localModel.getSpritePlacements(startX, startY, endX, endY);
     }
 }
