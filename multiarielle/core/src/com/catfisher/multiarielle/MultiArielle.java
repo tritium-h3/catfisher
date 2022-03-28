@@ -12,13 +12,14 @@ import com.catfisher.multiarielle.controller.KeyboardController;
 import com.catfisher.multiarielle.model.Character;
 import com.catfisher.multiarielle.model.AbsoluteModel;
 import com.catfisher.multiarielle.model.LocalModel;
+import com.catfisher.multiarielle.sprite.Sprite;
+import com.catfisher.multiarielle.sprite.SpriteAtlas;
 import lombok.Getter;
 
 
 public class MultiArielle extends Game {
 	@Getter
 	private SpriteBatch batch;
-	private Texture heroSpriteSheet;
 
 	private ModelServer server;
 	private ModelClient client;
@@ -30,15 +31,14 @@ public class MultiArielle extends Game {
 	private KeyboardController keyboardController;
 
 	@Getter
-	TextureRegion[][] heroSprites;
-	
+	SpriteAtlas atlas;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		heroSpriteSheet = new Texture("Hero 02 32.png");
-		heroSprites = TextureRegion.split(heroSpriteSheet, 32, 32);
+		atlas = new SpriteAtlas();
 
-		Character hero = new Character(heroSprites, "hero");
+		Character hero = new Character(Sprite.HERO, "hero");
 
 		localModel = new LocalModel();
 		server = new ModelServer();
@@ -59,6 +59,6 @@ public class MultiArielle extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		heroSpriteSheet.dispose();
+		atlas.dispose();
 	}
 }

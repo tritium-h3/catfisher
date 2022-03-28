@@ -35,7 +35,7 @@ public class AbsoluteModel implements Model, EventVisitor<Boolean>, EventConsume
                             (mp.getX() < endX) &&
                             (mp.getY() >= startY) &&
                             (mp.getY() < endY)))
-                    .map(mp -> new SpritePlacement(mp.getX(), mp.getY(), mp.getCharacter().getAppearance()[0][0]))
+                    .map(mp -> new SpritePlacement(mp.getX(), mp.getY(), mp.getCharacter().getAppearance()))
                     .collect(Collectors.toList());
         }
     }
