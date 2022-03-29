@@ -16,6 +16,8 @@ import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.sprite.SpriteAtlas;
 import lombok.Getter;
 
+import java.util.UUID;
+
 
 public class MultiArielle extends Game {
 	@Getter
@@ -37,8 +39,7 @@ public class MultiArielle extends Game {
 	public void create () {
 		batch = new SpriteBatch();
 		atlas = new SpriteAtlas();
-
-		Character hero = new Character(Sprite.HERO, "hero");
+		Character hero = new Character(Sprite.HERO, UUID.randomUUID().toString());
 
 		localModel = new LocalModel();
 		server = new ModelServer();

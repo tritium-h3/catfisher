@@ -17,6 +17,7 @@ public class ModelServer {
     private final AbsoluteModel trueModel;
     private final Collection<ModelClient> clients = new HashSet<>();
 
+
     @Value
     public static class ClientEvent {
         String clientId;
