@@ -1,10 +1,7 @@
 package com.catfisher.multiarielle.model;
 
 import com.catfisher.multiarielle.controller.*;
-import com.catfisher.multiarielle.controller.event.CharacterAddEvent;
-import com.catfisher.multiarielle.controller.event.Event;
-import com.catfisher.multiarielle.controller.event.MoveEvent;
-import com.catfisher.multiarielle.controller.event.SynchronizeEvent;
+import com.catfisher.multiarielle.controller.event.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -67,6 +64,11 @@ public class AbsoluteModel implements Model, EventVisitor<Boolean>, EventConsume
             allCharacters.add(new MutablePlacement(mp.getCharacter(), mp.getX(), mp.getY()));
         }
         return true;
+    }
+
+    @Override
+    public Boolean visit(ConnectEvent connectEvent) {
+        return false;
     }
 
     @Override

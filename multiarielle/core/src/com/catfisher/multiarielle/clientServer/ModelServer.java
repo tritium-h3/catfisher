@@ -15,7 +15,7 @@ import java.util.Map;
 @Log4j2
 public class ModelServer {
     private final AbsoluteModel trueModel;
-    private final Collection<ModelClient> clients = new HashSet<>();
+    private final Collection<ProxyClient> clients = new HashSet<>();
 
 
     @Value
@@ -28,7 +28,7 @@ public class ModelServer {
         trueModel = new AbsoluteModel();
     }
 
-    public void addClient(ModelClient client) {
+    public void addClient(ProxyClient client) {
         synchronized (this) {
             client.consume(
                     new SynchronizeEvent(trueModel.getAllCharacters())
@@ -44,7 +44,7 @@ public class ModelServer {
                 return false;
             }
             if (trueModel.consume(e.getEvent())) {
-                for (ModelClient client : clients) {
+                for (ProxyClient client : clients) {
                     if (!e.getClientId().equals(client.getClientId())) {
                         client.consume(e.getEvent());
                     }

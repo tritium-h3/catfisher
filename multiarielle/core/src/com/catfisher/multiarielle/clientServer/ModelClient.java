@@ -25,7 +25,8 @@ public class ModelClient implements EventConsumer<Boolean> {
 
     public void associateServer(ModelServer server) {
         this.server = server;
-        server.addClient(this);
+        // server.addClient(this);
+        // TODO: Server networking
     }
 
     @Override

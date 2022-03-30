@@ -1,6 +1,11 @@
 package com.catfisher.multiarielle.controller;
 
 import com.catfisher.multiarielle.clientServer.ModelServer;
+import com.catfisher.multiarielle.clientServer.ProxyClient;
+import com.catfisher.multiarielle.controller.event.CharacterAddEvent;
+import com.catfisher.multiarielle.controller.event.ConnectEvent;
+import com.catfisher.multiarielle.controller.event.MoveEvent;
+import com.catfisher.multiarielle.controller.event.SynchronizeEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.ServerBootstrap;
@@ -23,11 +28,15 @@ public class ServerController extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         String req = ((ByteBuf) msg).toString(StandardCharsets.UTF_8);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            ModelServer.ClientEvent e = mapper.readValue(req, ModelServer.ClientEvent.class);
-            if (!server.receive(e)) {
+            ModelServer.ClientEvent e = objectMapper.readValue(req, ModelServer.ClientEvent.class);
+            if (e.getEvent() instanceof ConnectEvent) {
+                ProxyClient proxyClient = new ProxyClient(e.getClientId(), ctx);
+                server.addClient(proxyClient);
+            }
+            else if (!server.receive(e)) {
                 return;
                 // TODO: Exception handling here
             }
