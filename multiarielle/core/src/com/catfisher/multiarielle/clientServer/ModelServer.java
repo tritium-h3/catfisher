@@ -4,6 +4,7 @@ import com.catfisher.multiarielle.controller.EventConsumer;
 import com.catfisher.multiarielle.controller.event.Event;
 import com.catfisher.multiarielle.controller.event.SynchronizeEvent;
 import com.catfisher.multiarielle.model.AbsoluteModel;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 
@@ -20,7 +21,9 @@ public class ModelServer {
 
     @Value
     public static class ClientEvent {
+        @JsonProperty("clientId")
         String clientId;
+        @JsonProperty("event")
         Event event;
     }
 

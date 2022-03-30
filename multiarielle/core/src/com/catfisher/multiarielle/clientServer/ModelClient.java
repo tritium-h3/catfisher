@@ -2,6 +2,7 @@ package com.catfisher.multiarielle.clientServer;
 
 import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.controller.EventConsumer;
+import com.catfisher.multiarielle.controller.event.ConnectEvent;
 import com.catfisher.multiarielle.controller.event.Event;
 import com.catfisher.multiarielle.model.AbsoluteModel;
 import com.catfisher.multiarielle.model.Model;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Log4j2
 public class ModelClient implements EventConsumer<Boolean> {
     private final AbsoluteModel localCopy;
-    private ModelServer server;
+    private ProxyServer server;
     @Getter
     private final String clientId;
 
@@ -23,10 +24,10 @@ public class ModelClient implements EventConsumer<Boolean> {
         this.clientId = UUID.randomUUID().toString();
     }
 
-    public void associateServer(ModelServer server) {
+    public void associateServer(ProxyServer server) {
         this.server = server;
-        // server.addClient(this);
-        // TODO: Server networking
+        server.setupClient(this);
+        forwardEventToServer(new ConnectEvent());
     }
 
     @Override
