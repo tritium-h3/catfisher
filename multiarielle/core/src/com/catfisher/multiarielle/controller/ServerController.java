@@ -42,8 +42,12 @@ public class ServerController extends ChannelInboundHandlerAdapter {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
 
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) {
 
+        server.removeClient(ctx);
     }
 
     @Override
@@ -51,6 +55,8 @@ public class ServerController extends ChannelInboundHandlerAdapter {
         String req = ((ByteBuf) msg).toString(StandardCharsets.UTF_8);
 
         ObjectMapper objectMapper = new ObjectMapper();
+
+        log.info("Message received");
 
         try {
             ModelServer.ClientEvent e = objectMapper.readValue(req, ModelServer.ClientEvent.class);

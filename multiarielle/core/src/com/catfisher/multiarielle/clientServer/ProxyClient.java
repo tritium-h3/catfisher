@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 public class ProxyClient implements EventConsumer<Boolean> {
     @Getter
     final String clientId;
+    @Getter
     final ChannelHandlerContext ctx;
 
     @Override

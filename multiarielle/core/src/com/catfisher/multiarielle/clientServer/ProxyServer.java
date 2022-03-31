@@ -59,8 +59,6 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
             if (!(event instanceof ConnectEvent)) {
                 client.consume(event);
             }
-
-            ctx.close();
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {

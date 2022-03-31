@@ -2,10 +2,7 @@ package com.catfisher.multiarielle.model;
 
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.event.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,6 +11,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AbsoluteModel implements Model, EventVisitor<Boolean>, EventConsumer<Boolean> {
     @Data
+    @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
     @AllArgsConstructor
     public static class MutablePlacement {
         Character character;
