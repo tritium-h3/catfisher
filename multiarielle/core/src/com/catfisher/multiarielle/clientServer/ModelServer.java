@@ -24,7 +24,6 @@ public class ModelServer {
     private final Collection<ProxyClient> clients = new HashSet<>();
 
     public void removeClient(ChannelHandlerContext ctx) {
-        // TODO: Remove disconnected player's characters
         clients.removeIf(client -> client.getCtx() == ctx);
     }
 

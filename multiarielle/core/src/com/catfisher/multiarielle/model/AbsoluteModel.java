@@ -3,12 +3,14 @@ package com.catfisher.multiarielle.model;
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.event.*;
 import lombok.*;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Log4j2
 public class AbsoluteModel implements Model, EventVisitor<Boolean>, EventConsumer<Boolean> {
     @Data
     @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
@@ -67,6 +69,12 @@ public class AbsoluteModel implements Model, EventVisitor<Boolean>, EventConsume
     @Override
     public Boolean visit(ConnectEvent connectEvent) {
         return false;
+    }
+
+    @Override
+    public Boolean visit(CharacterRemoveEvent characterRemoveEvent) {
+        allCharacters.removeIf(place -> place.getCharacter().getName().equals(characterRemoveEvent.getCharacter().getName()));
+        return true;
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.clientServer.ProxyServer;
 import com.catfisher.multiarielle.controller.event.CharacterAddEvent;
 import com.catfisher.multiarielle.controller.KeyboardController;
+import com.catfisher.multiarielle.controller.event.CharacterRemoveEvent;
 import com.catfisher.multiarielle.model.Character;
 import com.catfisher.multiarielle.model.AbsoluteModel;
 import com.catfisher.multiarielle.model.LocalModel;
@@ -44,11 +45,14 @@ public class MultiArielle extends Game {
 	@Getter
 	SpriteAtlas atlas;
 
+	private boolean gotToCharacterAdd;
+	private Character hero;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		atlas = new SpriteAtlas();
-		Character hero = new Character(Sprite.HERO, UUID.randomUUID().toString());
+		hero = new Character(Sprite.HERO, UUID.randomUUID().toString());
 
 		localModel = new LocalModel();
 		server = new ProxyServer();
@@ -58,6 +62,7 @@ public class MultiArielle extends Game {
 		client.associateServer(server);
 
 		localModel.consume(new CharacterAddEvent(hero, 10, 10));
+		gotToCharacterAdd = true;
 		keyboardController = new KeyboardController(hero, localModel);
 
 		Gdx.input.setInputProcessor(keyboardController);
@@ -91,6 +96,11 @@ public class MultiArielle extends Game {
 
 	@Override
 	public void dispose () {
+
+		if (gotToCharacterAdd) {
+			localModel.consume(new CharacterRemoveEvent(hero));
+		}
+
 		batch.dispose();
 		atlas.dispose();
 		workerGroup.shutdownGracefully();
