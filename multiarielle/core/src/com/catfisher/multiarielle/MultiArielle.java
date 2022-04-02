@@ -2,17 +2,13 @@ package com.catfisher.multiarielle;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.catfisher.multiarielle.clientServer.ModelClient;
-import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.clientServer.ProxyServer;
-import com.catfisher.multiarielle.controller.event.CharacterAddEvent;
+import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
 import com.catfisher.multiarielle.controller.KeyboardController;
-import com.catfisher.multiarielle.controller.event.CharacterRemoveEvent;
+import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
 import com.catfisher.multiarielle.model.Character;
-import com.catfisher.multiarielle.model.AbsoluteModel;
 import com.catfisher.multiarielle.model.LocalModel;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.sprite.SpriteAtlas;
@@ -61,7 +57,7 @@ public class MultiArielle extends Game {
 		localModel.associateClient(client);
 		client.associateServer(server);
 
-		localModel.consume(new CharacterAddEvent(hero, 10, 10));
+		localModel.consume(new CharacterAddDelta(hero, 10, 10));
 		gotToCharacterAdd = true;
 		keyboardController = new KeyboardController(hero, localModel);
 
@@ -98,7 +94,7 @@ public class MultiArielle extends Game {
 	public void dispose () {
 
 		if (gotToCharacterAdd) {
-			localModel.consume(new CharacterRemoveEvent(hero));
+			localModel.consume(new CharacterRemoveDelta(hero));
 		}
 
 		batch.dispose();

@@ -1,7 +1,9 @@
 package com.catfisher.multiarielle.clientServer;
 
-import com.catfisher.multiarielle.controller.EventConsumer;
-import com.catfisher.multiarielle.controller.event.Event;
+import com.catfisher.multiarielle.clientServer.event.ClientEvent;
+import com.catfisher.multiarielle.clientServer.event.ServerEvent;
+import com.catfisher.multiarielle.controller.DeltaConsumer;
+import com.catfisher.multiarielle.controller.delta.Delta;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.Unpooled;
@@ -14,14 +16,13 @@ import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 @Log4j2
-public class ProxyClient implements EventConsumer<Boolean> {
+public class ProxyClient {
     @Getter
     final String clientId;
     @Getter
     final ChannelHandlerContext ctx;
 
-    @Override
-    public Boolean consume(Event e) {
+    public Boolean consume(ServerEvent e) {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
@@ -30,9 +31,10 @@ public class ProxyClient implements EventConsumer<Boolean> {
             ctx.writeAndFlush(Unpooled.wrappedBuffer((eventToSend + "\r\n").getBytes(StandardCharsets.UTF_8))).sync();
             return true;
         } catch (JsonProcessingException ex) {
-            ex.printStackTrace();
+            log.error("Error parsing JSON from server", ex);
             return false;
         } catch (InterruptedException ex) {
+            log.error("Interrupted while sending message to server", ex);
             ex.printStackTrace();
             return false;
         }

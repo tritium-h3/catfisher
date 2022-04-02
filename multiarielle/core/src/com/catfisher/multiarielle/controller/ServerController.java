@@ -2,10 +2,8 @@ package com.catfisher.multiarielle.controller;
 
 import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.clientServer.ProxyClient;
-import com.catfisher.multiarielle.controller.event.CharacterAddEvent;
-import com.catfisher.multiarielle.controller.event.ConnectEvent;
-import com.catfisher.multiarielle.controller.event.MoveEvent;
-import com.catfisher.multiarielle.controller.event.SynchronizeEvent;
+import com.catfisher.multiarielle.clientServer.event.ClientEvent;
+import com.catfisher.multiarielle.clientServer.event.ConnectEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.ServerBootstrap;
@@ -17,7 +15,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -31,23 +28,18 @@ public class ServerController extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            String toSend = objectMapper.writeValueAsString(new ConnectEvent());
-            log.info("Sending {}", toSend);
-            ctx.writeAndFlush(Unpooled.wrappedBuffer((toSend + "\r\n").getBytes(StandardCharsets.UTF_8))).sync();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) {
 
         server.removeClient(ctx);
+    }
+
+    private void consume(ClientEvent e) {
+        if (!server.consume(e)) {
+            // TODO error handling
+        }
     }
 
     @Override
@@ -59,15 +51,14 @@ public class ServerController extends ChannelInboundHandlerAdapter {
         log.info("Message received");
 
         try {
-            ModelServer.ClientEvent e = objectMapper.readValue(req, ModelServer.ClientEvent.class);
+            ClientEvent e = objectMapper.readValue(req, ClientEvent.class);
+            ConnectEvent newConnect;
             log.info("Received event {}", e);
-            if (e.getEvent() instanceof ConnectEvent) {
-                ProxyClient proxyClient = new ProxyClient(e.getClientId(), ctx);
-                server.addClient(proxyClient);
-            }
-            else if (!server.receive(e)) {
-                return;
-                // TODO: Exception handling here
+            if (e instanceof ConnectEvent) {
+                newConnect = new ConnectEvent(e.getClientId(), ctx);
+                consume(newConnect);
+            } else {
+                consume(e);
             }
         } catch (JsonProcessingException ex) {
             ex.printStackTrace();

@@ -1,19 +1,16 @@
 package com.catfisher.multiarielle.clientServer;
 
-import com.catfisher.multiarielle.clientServer.ModelServer;
-import com.catfisher.multiarielle.controller.EventConsumer;
-import com.catfisher.multiarielle.controller.event.ConnectEvent;
-import com.catfisher.multiarielle.controller.event.Event;
+import com.catfisher.multiarielle.clientServer.event.*;
+import com.catfisher.multiarielle.controller.DeltaConsumer;
+import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.model.AbsoluteModel;
-import com.catfisher.multiarielle.model.Model;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.UUID;
 
 @Log4j2
-public class ModelClient implements EventConsumer<Boolean> {
+public class ModelClient implements ServerEventVisitor<Boolean> {
     private final AbsoluteModel localCopy;
     private ProxyServer server;
     @Getter
@@ -27,16 +24,20 @@ public class ModelClient implements EventConsumer<Boolean> {
     public void associateServer(ProxyServer server) {
         this.server = server;
         server.setupClient(this);
-        forwardEventToServer(new ConnectEvent());
+        server.receive(new ConnectEvent(this.clientId, null));
+    }
+
+    public Boolean consume(ServerEvent e) {
+        return e.receive(this);
     }
 
     @Override
-    public Boolean consume(Event e) {
+    public Boolean visit(ServerDeltaEvent e) {
         log.info("Client received from server event {}", e);
-        return localCopy.consume(e);
+        return localCopy.consume(e.getDelta());
     }
 
-    public boolean forwardEventToServer(Event e) {
-        return server.receive(new ModelServer.ClientEvent(clientId, e));
+    public boolean forwardDeltaToServer(Delta e) {
+        return server.receive(new ClientDeltaEvent(clientId, e));
     }
 }

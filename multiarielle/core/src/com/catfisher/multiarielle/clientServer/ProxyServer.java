@@ -1,9 +1,10 @@
 package com.catfisher.multiarielle.clientServer;
 
 
-import com.badlogic.gdx.utils.ObjectMap;
-import com.catfisher.multiarielle.controller.event.ConnectEvent;
-import com.catfisher.multiarielle.controller.event.Event;
+import com.catfisher.multiarielle.clientServer.event.ClientEvent;
+import com.catfisher.multiarielle.clientServer.event.ConnectEvent;
+import com.catfisher.multiarielle.clientServer.event.ServerEvent;
+import com.catfisher.multiarielle.controller.delta.Delta;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +26,7 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
         this.client = client;
     }
 
-    public boolean receive(ModelServer.ClientEvent e) {
+    public boolean receive(ClientEvent e) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String serialized = objectMapper.writeValueAsString(e);
@@ -52,13 +53,10 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            Event event = objectMapper.readValue(messageStr, Event.class);
-
+            ServerEvent event = objectMapper.readValue(messageStr, ServerEvent.class);
             log.info("Event received: {}", event);
 
-            if (!(event instanceof ConnectEvent)) {
-                client.consume(event);
-            }
+            client.consume(event);
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {
@@ -70,7 +68,7 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        log.error("Network error", cause);
         ctx.close();
     }
 
