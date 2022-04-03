@@ -1,7 +1,7 @@
-package com.catfisher.multiarielle.clientServer.event;
+package com.catfisher.multiarielle.clientServer.event.client;
 
-import com.catfisher.multiarielle.controller.DeltaVisitor;
-import com.catfisher.multiarielle.controller.delta.Delta;
+import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
+import com.catfisher.multiarielle.clientServer.event.client.ClientEventVisitor;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.*;
 

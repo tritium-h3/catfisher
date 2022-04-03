@@ -1,4 +1,4 @@
-package com.catfisher.multiarielle.clientServer.event;
+package com.catfisher.multiarielle.clientServer.event.server;
 
 import com.catfisher.multiarielle.controller.delta.Delta;
 import lombok.AccessLevel;

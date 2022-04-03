@@ -1,8 +1,7 @@
-package com.catfisher.multiarielle.clientServer.event;
+package com.catfisher.multiarielle.clientServer.event.client;
 
 import com.catfisher.multiarielle.controller.delta.Delta;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 

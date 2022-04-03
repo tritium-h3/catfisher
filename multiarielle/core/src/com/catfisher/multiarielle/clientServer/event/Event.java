@@ -1,9 +1,7 @@
 package com.catfisher.multiarielle.clientServer.event;
 
-import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
-import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
-import com.catfisher.multiarielle.controller.delta.MoveDelta;
-import com.catfisher.multiarielle.controller.delta.SynchronizeDelta;
+import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerEvent;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;

@@ -1,10 +1,8 @@
 package com.catfisher.multiarielle.clientServer;
 
 
-import com.catfisher.multiarielle.clientServer.event.ClientEvent;
-import com.catfisher.multiarielle.clientServer.event.ConnectEvent;
-import com.catfisher.multiarielle.clientServer.event.ServerEvent;
-import com.catfisher.multiarielle.controller.delta.Delta;
+import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

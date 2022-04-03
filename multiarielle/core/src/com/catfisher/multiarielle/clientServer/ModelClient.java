@@ -1,7 +1,11 @@
 package com.catfisher.multiarielle.clientServer;
 
-import com.catfisher.multiarielle.clientServer.event.*;
-import com.catfisher.multiarielle.controller.DeltaConsumer;
+import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
+import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerDeltaEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerEventVisitor;
+import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.model.AbsoluteModel;
 import lombok.Getter;
@@ -35,6 +39,13 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
     public Boolean visit(ServerDeltaEvent e) {
         log.info("Client received from server event {}", e);
         return localCopy.consume(e.getDelta());
+    }
+
+    @Override
+    public Boolean visit(SynchronizeEvent e) {
+        log.info("Client received from server event {}", e);
+        localCopy.synchronize(e);
+        return true;
     }
 
     public boolean forwardDeltaToServer(Delta e) {

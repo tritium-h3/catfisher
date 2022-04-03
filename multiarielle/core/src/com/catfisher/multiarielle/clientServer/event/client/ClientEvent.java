@@ -1,5 +1,6 @@
-package com.catfisher.multiarielle.clientServer.event;
+package com.catfisher.multiarielle.clientServer.event.client;
 
+import com.catfisher.multiarielle.clientServer.event.Event;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;

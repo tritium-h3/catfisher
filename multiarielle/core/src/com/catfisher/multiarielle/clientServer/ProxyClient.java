@@ -1,9 +1,6 @@
 package com.catfisher.multiarielle.clientServer;
 
-import com.catfisher.multiarielle.clientServer.event.ClientEvent;
-import com.catfisher.multiarielle.clientServer.event.ServerEvent;
-import com.catfisher.multiarielle.controller.DeltaConsumer;
-import com.catfisher.multiarielle.controller.delta.Delta;
+import com.catfisher.multiarielle.clientServer.event.server.ServerEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.Unpooled;

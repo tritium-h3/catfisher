@@ -1,6 +1,7 @@
 package com.catfisher.multiarielle.model;
 
-import com.catfisher.multiarielle.clientServer.event.ConnectEvent;
+import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
+import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.delta.*;
 import lombok.*;
@@ -58,18 +59,9 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
         return true;
     }
 
-    @Override
-    public Boolean visit(SynchronizeDelta e) {
-        allCharacters = new HashSet<>(e.getAllCharacters().size());
-        for (MutablePlacement mp : e.getAllCharacters()) {
-            allCharacters.add(new MutablePlacement(mp.getCharacter(), mp.getX(), mp.getY()));
-        }
+    public Boolean synchronize(SynchronizeEvent e) {
+        allCharacters = e.getAllCharacters();
         return true;
-    }
-
-    @Override
-    public Boolean visit(ConnectEvent connectEvent) {
-        return false;
     }
 
     @Override

@@ -1,16 +1,14 @@
 package com.catfisher.multiarielle.clientServer;
 
-import com.catfisher.multiarielle.clientServer.event.*;
+import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
+import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
+import com.catfisher.multiarielle.clientServer.event.client.ClientEventVisitor;
+import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerDeltaEvent;
 import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
-import com.catfisher.multiarielle.controller.delta.Delta;
-import com.catfisher.multiarielle.controller.delta.SynchronizeDelta;
+import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.model.AbsoluteModel;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Collection;
@@ -31,9 +29,7 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
 
     public void addClient(ProxyClient client) {
         synchronized (this) {
-            client.consume(
-                    new ServerDeltaEvent(new SynchronizeDelta(trueModel.getAllCharacters()))
-            );
+            client.consume(new SynchronizeEvent(trueModel.getAllCharacters()));
             clients.add(client);
         }
     }
@@ -48,9 +44,6 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
 
     @Override
     public Boolean visit(ClientDeltaEvent e) {
-        if (e.getDelta() instanceof SynchronizeDelta) {
-            return false;
-        }
         log.info("Consuming delta {}", e.getDelta());
         if (trueModel.consume(e.getDelta())) {
             for (ProxyClient client : clients) {

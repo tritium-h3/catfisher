@@ -1,4 +1,4 @@
-package com.catfisher.multiarielle.clientServer.event;
+package com.catfisher.multiarielle.clientServer.event.client;
 
 public interface ClientEventVisitor<Response> {
     Response visit(ConnectEvent e);
