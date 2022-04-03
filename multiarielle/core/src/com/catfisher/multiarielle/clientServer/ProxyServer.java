@@ -25,15 +25,17 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
     }
 
     public boolean receive(ClientEvent e) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            String serialized = objectMapper.writeValueAsString(e);
-            log.info("Serialized into {}", serialized);
-            conn.writeAndFlush(Unpooled.wrappedBuffer((serialized + "\r\n").getBytes(StandardCharsets.UTF_8))).sync();
-        } catch (JsonProcessingException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
+        synchronized (this) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                String serialized = objectMapper.writeValueAsString(e);
+                log.debug("Serialized into {}", serialized);
+                conn.writeAndFlush(Unpooled.wrappedBuffer((serialized + "\r\n").getBytes(StandardCharsets.UTF_8))).sync();
+            } catch (JsonProcessingException ex) {
+                log.error("Json processing exception", ex);
+            } catch (InterruptedException ex) {
+                log.error("Interrupted", ex);
+            }
         }
         return true;
     }

@@ -10,14 +10,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RequiredArgsConstructor
 @Log4j2
 public class ProxyClient {
     @Getter
-    final String clientId;
+    private final String clientId;
     @Getter
-    final ChannelHandlerContext ctx;
+    private final ChannelHandlerContext ctx;
+    @Getter
+    private final AtomicLong sequenceNumberWatermark = new AtomicLong(0);
 
     public Boolean consume(ServerEvent e) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -31,7 +34,7 @@ public class ProxyClient {
             log.error("Error parsing JSON from server", ex);
             return false;
         } catch (InterruptedException ex) {
-            log.error("Interrupted while sending message to server", ex);
+            log.error("Interrupted while sending message to client", ex);
             ex.printStackTrace();
             return false;
         }

@@ -9,11 +9,14 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.util.Collection;
+import java.util.List;
 
 @Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class SynchronizeEvent extends ServerEvent {
+    long sequenceNumberWatermark;
+
     Collection<AbsoluteModel.MutablePlacement> allCharacters;
 
     @Override

@@ -20,10 +20,11 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.UUID;
 
-
+@Log4j2
 public class MultiArielle extends Game {
 	EventLoopGroup workerGroup;
 	@Getter
@@ -45,7 +46,7 @@ public class MultiArielle extends Game {
 	private Character hero;
 
 	@Override
-	public void create () {
+	public void create ()  {
 		batch = new SpriteBatch();
 		atlas = new SpriteAtlas();
 		hero = new Character(Sprite.HERO, UUID.randomUUID().toString());
@@ -56,6 +57,13 @@ public class MultiArielle extends Game {
 		setupServerConn(server);
 		localModel.associateClient(client);
 		client.associateServer(server);
+
+		try {
+			client.waitForServerReady();
+		} catch (InterruptedException exn) {
+			log.info("Interrupted while waiting for server to be ready", exn);
+			System.exit(0);
+		}
 
 		localModel.consume(new CharacterAddDelta(hero, 10, 10));
 		gotToCharacterAdd = true;
@@ -83,6 +91,7 @@ public class MultiArielle extends Game {
 
 			// Start the client.
 			ChannelFuture f = b.connect("localhost", 8080).sync(); // (5)
+			f.await();
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
