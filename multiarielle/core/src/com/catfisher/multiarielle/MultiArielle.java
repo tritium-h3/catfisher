@@ -42,7 +42,6 @@ public class MultiArielle extends Game {
 	@Getter
 	SpriteAtlas atlas;
 
-	private boolean gotToCharacterAdd;
 	private Character hero;
 
 	@Override
@@ -66,7 +65,6 @@ public class MultiArielle extends Game {
 		}
 
 		localModel.consume(new CharacterAddDelta(hero, 10, 10));
-		gotToCharacterAdd = true;
 		keyboardController = new KeyboardController(hero, localModel);
 
 		Gdx.input.setInputProcessor(keyboardController);
@@ -101,11 +99,6 @@ public class MultiArielle extends Game {
 
 	@Override
 	public void dispose () {
-
-		if (gotToCharacterAdd) {
-			localModel.consume(new CharacterRemoveDelta(hero));
-		}
-
 		batch.dispose();
 		atlas.dispose();
 		workerGroup.shutdownGracefully();
