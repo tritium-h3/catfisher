@@ -19,6 +19,17 @@ public class Server {
 
         log.info("Server started");
 
+        new Thread(() -> {
+            try {
+                while (true) {
+                    Thread.sleep(10000);
+                    server.synchronizeAllClients();
+                }
+            } catch (InterruptedException e) {
+                log.error("Interrupted while sleeping ", e);
+            }
+        }).start();
+
         serverController.run();
     }
 }

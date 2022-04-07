@@ -70,6 +70,13 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         }
     }
 
+    public void synchronizeAllClients() {
+        log.info("Synchronizing clients");
+        for (ProxyClient client : clients.values()) {
+            client.consume(new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getAllCharacters()));
+        }
+    }
+
     @Override
     public Boolean visit(ClientDeltaEvent e) {
         Delta delta = e.getDelta();
@@ -97,6 +104,5 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
             return e.receive(this);
         }
     }
-
 
 }
