@@ -5,10 +5,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.stream.ChunkedFile;
+import io.netty.handler.stream.ChunkedInput;
+import io.netty.handler.stream.ChunkedStream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -28,14 +33,10 @@ public class ProxyClient {
         try {
             String eventToSend = objectMapper.writeValueAsString(e);
             log.info("Sending {}", eventToSend);
-            ctx.writeAndFlush(Unpooled.wrappedBuffer((eventToSend + "\r\n").getBytes(StandardCharsets.UTF_8))).sync();
+            ctx.writeAndFlush(new ChunkedStream(new ByteArrayInputStream(eventToSend.getBytes(StandardCharsets.UTF_8))));
             return true;
         } catch (JsonProcessingException ex) {
             log.error("Error parsing JSON from server", ex);
-            return false;
-        } catch (InterruptedException ex) {
-            log.error("Interrupted while sending message to client", ex);
-            ex.printStackTrace();
             return false;
         }
     }
