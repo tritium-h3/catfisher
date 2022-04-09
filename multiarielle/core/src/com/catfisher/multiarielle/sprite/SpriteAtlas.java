@@ -2,25 +2,21 @@ package com.catfisher.multiarielle.sprite;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.map.LazyMap;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@NoArgsConstructor
 public class SpriteAtlas {
-    private final Map<Sprite, TextureRegion[][]> spriteSheetMap = new HashMap<>();
-
-    public SpriteAtlas() {
-        Texture heroSpriteSheet = new Texture("Hero 02 32.png");
-        Texture outdoorSpriteSheet = new Texture("Outdoor.png");
-        TextureRegion[][] outdoorTileset = TextureRegion.split(outdoorSpriteSheet, 32, 32);
-        TextureRegion[][] emptyTileset = {{outdoorTileset[0][0]}};
-        spriteSheetMap.put(Sprite.HERO, TextureRegion.split(heroSpriteSheet, 32, 32));
-        spriteSheetMap.put(Sprite.EMPTY,  emptyTileset);
-    }
+    private final Map<String, TextureRegion[][]> spriteSheetMap =
+            LazyMap.lazyMap(new HashMap<>(), sheetName -> TextureRegion.split(new Texture(sheetName), 32, 32));
 
     public TextureRegion getTextureRegion(Sprite sprite) {
-        return spriteSheetMap.get(sprite)[0][0];
+        return spriteSheetMap.get(sprite.getSheetName())[sprite.getSheetX()][sprite.getSheetY()];
     }
 
     public void dispose() {
