@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.catfisher.multiarielle.model.Model;
+import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.sprite.SpriteAtlas;
 import lombok.extern.log4j.Log4j2;
 
@@ -34,8 +35,11 @@ public class LocalScreen implements Screen {
 
         game.getBatch().begin();
 
-        for (Model.SpritePlacement placement : localModel.getSpritePlacements(0, 0, 20, 20)) {
-            game.getBatch().draw(atlas.getTextureRegion(placement.getSprite()), placement.getX() * 32, placement.getY() * 32);
+        Sprite[][] placements = localModel.getSpritePlacements(0, 0, 20, 20);
+        for (int x = 0; x < 20; x++) {
+            for (int y = 0; y < 20; y++) {
+                game.getBatch().draw(atlas.getTextureRegion(placements[x][y]), x * 32, y * 32);
+            }
         }
 
         game.getBatch().end();

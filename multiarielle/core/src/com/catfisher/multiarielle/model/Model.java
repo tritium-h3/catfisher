@@ -6,11 +6,5 @@ import lombok.Value;
 
 public interface Model {
 
-    @Value
-    class SpritePlacement {
-        int x, y;
-        Sprite sprite;
-    }
-
-    Iterable<SpritePlacement> getSpritePlacements(int startX, int startY, int endX, int endY);
+    Sprite[][] getSpritePlacements(int startX, int startY, int endX, int endY);
 }

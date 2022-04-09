@@ -3,6 +3,7 @@ package com.catfisher.multiarielle.model;
 import com.catfisher.multiarielle.clientServer.ModelClient;
 import com.catfisher.multiarielle.controller.DeltaConsumer;
 import com.catfisher.multiarielle.controller.delta.Delta;
+import com.catfisher.multiarielle.sprite.Sprite;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
@@ -23,7 +24,7 @@ public class LocalModel implements Model, DeltaConsumer<Boolean> {
     }
 
     @Override
-    public Iterable<SpritePlacement> getSpritePlacements(int startX, int startY, int endX, int endY) {
+    public Sprite[][] getSpritePlacements(int startX, int startY, int endX, int endY) {
         return localModel.getSpritePlacements(startX, startY, endX, endY);
     }
 }

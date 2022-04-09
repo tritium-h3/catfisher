@@ -1,6 +1,7 @@
 package com.catfisher.multiarielle.clientServer.event.server;
 
 import com.catfisher.multiarielle.model.AbsoluteModel;
+import com.catfisher.multiarielle.model.BackgroundTile;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.Collection;
 public class SynchronizeEvent extends ServerEvent {
     long sequenceNumberWatermark;
 
+    BackgroundTile[][] background;
     Collection<AbsoluteModel.MutablePlacement> allCharacters;
 
     @Override
