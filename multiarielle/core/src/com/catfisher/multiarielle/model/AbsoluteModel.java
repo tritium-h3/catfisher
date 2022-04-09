@@ -3,7 +3,6 @@ package com.catfisher.multiarielle.model;
 import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.delta.*;
-import com.catfisher.multiarielle.world.World;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
@@ -16,9 +15,16 @@ import java.util.stream.Collectors;
 public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsumer<Boolean> {
 
     @Getter
-    private Collection<World.MutablePlacement> allCharacters = new HashSet<>();
+    private Collection<MutablePlacement> allCharacters = new HashSet<>();
 
-    
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+    public static class MutablePlacement {
+        Character character;
+        int x;
+        int y;
+    }
 
     @Override
     public Iterable<SpritePlacement> getSpritePlacements(int startX, int startY, int endX, int endY) {
@@ -36,7 +42,7 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
     @Override
     public Boolean visit(MoveDelta e) {
         synchronized (this) {
-            for (World.MutablePlacement p : allCharacters) {
+            for (MutablePlacement p : allCharacters) {
                 if (p.getCharacter().getName().equals(e.getCharacter().getName())) {
                     p.setX(p.getX() + e.getDeltaX());
                     p.setY(p.getY() + e.getDeltaY());
@@ -49,7 +55,7 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
 
     @Override
     public Boolean visit(CharacterAddDelta e) {
-        allCharacters.add(new World.MutablePlacement(e.getCharacter(), e.getX(), e.getY()));
+        allCharacters.add(new MutablePlacement(e.getCharacter(), e.getX(), e.getY()));
         return true;
     }
 
