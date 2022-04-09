@@ -15,6 +15,8 @@ import com.catfisher.multiarielle.model.Character;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +47,11 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
             log.info("All characters: {}", trueModel.getAllCharacters());
             clients.put(client.getClientId(), client);
             client.consume(new ServerConnectionAcknowledged());
-            client.consume(new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getAllCharacters()));
+            SynchronizeEvent event;
+            synchronized (trueModel) {
+                event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.copyCharacters());
+            }
+            client.consume(event);
         }
     }
 
@@ -70,10 +76,23 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         }
     }
 
+    Map<ProxyClient, SynchronizeEvent> generateSynchronizeEventForAllClients() {
+        Map<ProxyClient, SynchronizeEvent> toReturn = new HashMap<>();
+        synchronized(trueModel) {
+            Collection<AbsoluteModel.MutablePlacement> placements = trueModel.copyCharacters();
+            for (ProxyClient client : clients.values()) {
+                SynchronizeEvent event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), placements);
+                toReturn.put(client, event);
+            }
+        }
+        return toReturn;
+    }
+
     public void synchronizeAllClients() {
         log.info("Synchronizing clients");
-        for (ProxyClient client : clients.values()) {
-            client.consume(new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getAllCharacters()));
+        Map<ProxyClient, SynchronizeEvent> events = generateSynchronizeEventForAllClients();
+        for (Map.Entry<ProxyClient, SynchronizeEvent> event : events.entrySet()) {
+            event.getKey().consume(event.getValue());
         }
     }
 
@@ -84,14 +103,16 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         log.info("Consuming delta [{}] {}", senderId, delta);
 
         ProxyClient sender = clients.get(senderId);
-        sender.getSequenceNumberWatermark().getAndAccumulate(e.getSequenceNumber(), Long::max);
-        if (delta instanceof CharacterAddDelta) {
-            CharacterAddDelta characterAddDelta = (CharacterAddDelta) delta;
-            if (clientCharacters.containsKey(senderId)) {
-                log.error("Client already has a character {}", senderId);
-                return false;
-            } else {
-                clientCharacters.put(senderId, characterAddDelta.getCharacter());
+            synchronized (trueModel) {
+                sender.getSequenceNumberWatermark().getAndAccumulate(e.getSequenceNumber(), Long::max);
+                if (delta instanceof CharacterAddDelta) {
+                    CharacterAddDelta characterAddDelta = (CharacterAddDelta) delta;
+                    if (clientCharacters.containsKey(senderId)) {
+                        log.error("Client already has a character {}", senderId);
+                        return false;
+                } else {
+                    clientCharacters.put(senderId, characterAddDelta.getCharacter());
+                }
             }
         }
         applyDelta(senderId, delta);

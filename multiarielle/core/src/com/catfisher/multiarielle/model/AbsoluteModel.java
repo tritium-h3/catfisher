@@ -24,6 +24,14 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
         Character character;
         int x;
         int y;
+
+        public MutablePlacement copy() {
+            return new MutablePlacement(character, x, y);
+        }
+    }
+
+    public Collection<MutablePlacement> copyCharacters() {
+        return allCharacters.stream().map(MutablePlacement::copy).collect(Collectors.toList());
     }
 
     @Override
