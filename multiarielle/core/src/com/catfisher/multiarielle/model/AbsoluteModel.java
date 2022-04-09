@@ -7,9 +7,11 @@ import com.catfisher.multiarielle.sprite.Sprite;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -27,6 +29,22 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                 background[x][y] = BackgroundTile.EMPTY;
             }
         }
+    }
+
+    public void loadBackground(String filename) throws IOException {
+        List<BackgroundTile[]> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                BackgroundTile[] tileLine =
+                        Arrays.stream(values).map(
+                                val -> BackgroundTile.values()[Integer.parseInt(val)]
+                        ).toArray(BackgroundTile[]::new);
+                lines.add(tileLine);
+            }
+        }
+        background = lines.toArray(new BackgroundTile[0][0]);
     }
 
     @Data

@@ -13,6 +13,7 @@ import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.model.AbsoluteModel;
 import com.catfisher.multiarielle.model.Character;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Log4j2
 public class ModelServer implements ClientEventVisitor<Boolean> {
+    @Getter
     private final AbsoluteModel trueModel;
     private final Map<String, ProxyClient> clients = new HashMap<>();
     private final Map<String, Character> clientCharacters = new HashMap<>();

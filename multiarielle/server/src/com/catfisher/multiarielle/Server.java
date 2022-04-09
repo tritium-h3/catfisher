@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 public class Server {
     public static void main (String[] arg) throws Exception {
         ModelServer server = new ModelServer();
+        server.getTrueModel().loadBackground("bg.csv");
         int port = 8080;
         if (arg.length > 0) {
             port = Integer.parseInt(arg[0]);

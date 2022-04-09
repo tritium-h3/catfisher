@@ -16,7 +16,7 @@ public class SpriteAtlas {
             LazyMap.lazyMap(new HashMap<>(), sheetName -> TextureRegion.split(new Texture(sheetName), 32, 32));
 
     public TextureRegion getTextureRegion(Sprite sprite) {
-        return spriteSheetMap.get(sprite.getSheetName())[sprite.getSheetX()][sprite.getSheetY()];
+        return spriteSheetMap.get(sprite.getSheetName())[sprite.getSheetY()][sprite.getSheetX()];
     }
 
     public void dispose() {
