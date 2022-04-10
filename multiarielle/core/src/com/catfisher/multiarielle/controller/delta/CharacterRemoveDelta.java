@@ -17,4 +17,9 @@ public class CharacterRemoveDelta extends Delta {
     public <Response> Response accept(DeltaVisitor<Response> v) {
         return v.visit(this);
     }
+
+    @Override
+    public Delta invert() {
+        return null;
+    }
 }

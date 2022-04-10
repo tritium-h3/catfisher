@@ -6,6 +6,7 @@ import com.catfisher.multiarielle.clientServer.event.client.ClientEventVisitor;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
 import com.catfisher.multiarielle.clientServer.event.server.ServerConnectionAcknowledged;
 import com.catfisher.multiarielle.clientServer.event.server.ServerDeltaEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerRejectDeltaEvent;
 import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
 import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
@@ -117,8 +118,12 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
                 }
             }
         }
-        applyDelta(senderId, delta);
-        return true;
+        if (applyDelta(senderId, delta)) {
+            return true;
+        } else {
+            sender.consume(new ServerRejectDeltaEvent(e.getSequenceNumber()));
+            return false;
+        }
     }
 
     public Boolean consume(ClientEvent e) {

@@ -6,4 +6,5 @@ public interface ServerEventVisitor<Response> {
     Response visit(ServerDeltaEvent e);
     Response visit(SynchronizeEvent e);
     Response visit(ServerConnectionAcknowledged e);
+    Response visit(ServerRejectDeltaEvent e);
 }

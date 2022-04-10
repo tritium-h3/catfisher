@@ -17,4 +17,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public abstract class Delta {
     public abstract <Response> Response accept(DeltaVisitor<Response> v);
+
+    public abstract Delta invert();
 }

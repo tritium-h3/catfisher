@@ -78,6 +78,19 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
         return true;
     }
 
+    @Override
+    public Boolean visit(ServerRejectDeltaEvent e) {
+        for (Map.Entry<Long, Delta> delta : unacknowledgedDeltas.entrySet()) {
+            if (delta.getKey().equals(e.getSequenceId())) {
+                Delta inverted = delta.getValue().invert();
+                if (inverted != null) {
+                    return localCopy.consume(inverted);
+                }
+            }
+        }
+        return true;
+    }
+
     public void waitForServerReady() throws InterruptedException {
         log.info("Waiting for server to acknowledge");
         synchronized (isServerReady) {
