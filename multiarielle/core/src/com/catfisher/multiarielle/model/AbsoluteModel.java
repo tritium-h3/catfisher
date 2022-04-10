@@ -109,7 +109,8 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                     int newX = p.getX() + e.getDeltaX();
                     int newY = p.getY() + e.getDeltaY();
 
-                    if (background[newX][newY].isImpassible()) {
+                    if ((newX < 0) || (newY < 0) || (newX >= background.length) || (newY >= background[0].length) ||
+                            (background[newX][newY] == null) || (background[newX][newY].isImpassible())) {
                         return false;
                     } else {
                         p.setX(newX);
