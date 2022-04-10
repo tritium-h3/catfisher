@@ -20,7 +20,7 @@ public class SpriteAtlas {
     }
 
     public void dispose() {
-        for (Sprite sprite : Sprite.values()) {
+        for (String sprite : spriteSheetMap.keySet()) {
             spriteSheetMap.get(sprite)[0][0].getTexture().dispose();
         }
     }

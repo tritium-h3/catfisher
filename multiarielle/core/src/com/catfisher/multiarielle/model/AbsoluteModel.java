@@ -44,7 +44,15 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                 lines.add(tileLine);
             }
         }
-        background = lines.toArray(new BackgroundTile[0][0]);
+        BackgroundTile[][] loadedOrientation = lines.toArray(new BackgroundTile[0][0]);
+        int loadedYSize = loadedOrientation[0].length;
+        int loadedXSize = loadedOrientation.length;
+        background = new BackgroundTile[loadedYSize][loadedXSize];
+        for (int x = 0; x < loadedYSize; x++) {
+            for (int y = 0; y < loadedXSize; y++) {
+                background[x][y] = loadedOrientation[loadedXSize-y-1][x];
+            }
+        }
     }
 
     @Data

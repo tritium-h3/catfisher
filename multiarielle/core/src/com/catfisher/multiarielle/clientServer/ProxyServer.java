@@ -10,12 +10,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.charset.StandardCharsets;
 
 @Log4j2
-public class ProxyServer extends ChannelInboundHandlerAdapter {
+public class ProxyServer extends SimpleChannelInboundHandler<String> {
 
     ModelClient client;
     ChannelHandlerContext conn;
@@ -30,7 +31,7 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
             try {
                 String serialized = objectMapper.writeValueAsString(e);
                 log.debug("Serialized into {}", serialized);
-                conn.writeAndFlush(Unpooled.wrappedBuffer((serialized + "\r\n").getBytes(StandardCharsets.UTF_8))).sync();
+                conn.writeAndFlush(serialized).sync();
             } catch (JsonProcessingException ex) {
                 log.error("Json processing exception", ex);
             } catch (InterruptedException ex) {
@@ -46,14 +47,11 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        ByteBuf m = (ByteBuf) msg;
-        String messageStr = m.toString(StandardCharsets.UTF_8);
-
+    public void channelRead0(ChannelHandlerContext ctx, String msg) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            ServerEvent event = objectMapper.readValue(messageStr, ServerEvent.class);
+            ServerEvent event = objectMapper.readValue(msg, ServerEvent.class);
             log.info("Event received: {}", event);
 
             client.consume(event);
@@ -61,8 +59,6 @@ public class ProxyServer extends ChannelInboundHandlerAdapter {
             e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-        } finally {
-            m.release();
         }
     }
 

@@ -11,6 +11,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
@@ -21,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 @Log4j2
-public class ServerController extends ChannelInboundHandlerAdapter {
+public class ServerController extends SimpleChannelInboundHandler<String> {
     private final ModelServer server;
     private final int port;
 
@@ -42,15 +44,13 @@ public class ServerController extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        String req = ((ByteBuf) msg).toString(StandardCharsets.UTF_8);
-
+    public void channelRead0(ChannelHandlerContext ctx, String msg) {
         ObjectMapper objectMapper = new ObjectMapper();
 
         log.info("Message received");
 
         try {
-            ClientEvent e = objectMapper.readValue(req, ClientEvent.class);
+            ClientEvent e = objectMapper.readValue(msg, ClientEvent.class);
             ConnectEvent newConnect;
             log.info("Received event {}", e);
             if (e instanceof ConnectEvent) {
@@ -82,7 +82,8 @@ public class ServerController extends ChannelInboundHandlerAdapter {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new ChunkedWriteHandler());
+                            ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
+                            ch.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
                             ch.pipeline().addLast(new ServerController(server, port));
                         }
                     })

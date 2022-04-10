@@ -33,7 +33,7 @@ public class ProxyClient {
         try {
             String eventToSend = objectMapper.writeValueAsString(e);
             log.info("Sending {}", eventToSend);
-            ctx.writeAndFlush(new ChunkedStream(new ByteArrayInputStream(eventToSend.getBytes(StandardCharsets.UTF_8))));
+            ctx.writeAndFlush(eventToSend);
             return true;
         } catch (JsonProcessingException ex) {
             log.error("Error parsing JSON from server", ex);

@@ -17,12 +17,15 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Log4j2
@@ -84,7 +87,8 @@ public class MultiArielle extends Game {
 			b.handler(new ChannelInitializer<SocketChannel>() {
 				@Override
 				public void initChannel(SocketChannel ch) throws Exception {
-					ch.pipeline().addLast(new ChunkedWriteHandler());
+					ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
+					ch.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
 					ch.pipeline().addLast(server);
 				}
 			});
