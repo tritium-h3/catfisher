@@ -46,6 +46,7 @@ public class MultiArielle extends Game {
 	@Getter
 	SpriteAtlas atlas;
 
+	@Getter
 	private Character hero;
 
 	@Override
