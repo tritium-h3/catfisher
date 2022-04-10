@@ -7,6 +7,8 @@ import com.catfisher.multiarielle.sprite.Sprite;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.List;
+
 @Log4j2
 public class LocalModel implements Model, DeltaConsumer<Boolean> {
     @Getter
@@ -24,7 +26,7 @@ public class LocalModel implements Model, DeltaConsumer<Boolean> {
     }
 
     @Override
-    public Sprite[][] getSpritePlacements(int startX, int startY, int endX, int endY) {
+    public List<Sprite>[][] getSpritePlacements(int startX, int startY, int endX, int endY) {
         return localModel.getSpritePlacements(startX, startY, endX, endY);
     }
 }

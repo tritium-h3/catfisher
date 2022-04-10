@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.catfisher.multiarielle.sprite.Sprite;
 import lombok.Value;
 
+import java.util.List;
+
 public interface Model {
 
-    Sprite[][] getSpritePlacements(int startX, int startY, int endX, int endY);
+    List<Sprite>[][] getSpritePlacements(int startX, int startY, int endX, int endY);
 }

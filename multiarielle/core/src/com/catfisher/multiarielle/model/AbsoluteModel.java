@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,15 +74,18 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
     }
 
     @Override
-    public Sprite[][] getSpritePlacements(int startX, int startY, int endX, int endY) {
-        Sprite[][] toReturn = new Sprite[endX - startX][endY - startY];
+    public List<Sprite>[][] getSpritePlacements(int startX, int startY, int endX, int endY) {
+        List<Sprite>[][] toReturn = new List[endX - startX][endY - startY];
+
         synchronized (this) {
             for (int x = startX; x < endX; x++) {
                 for (int y = startY; y < endY; y++) {
                     if (background[x][y] == null) {
-                        toReturn[x-startX][y-startY] = Sprite.EMPTY;
+                        toReturn[x-startX][y-startY] = new ArrayList<>();
+                        toReturn[x-startX][y-startY].add(Sprite.EMPTY);
                     } else {
-                        toReturn[x - startX][y - startY] = background[x][y].getAppearance();
+                        toReturn[x-startX][y-startY] = new ArrayList<>();
+                        toReturn[x - startX][y - startY].add(background[x][y].getAppearance());
                     }
                 }
             }
@@ -90,7 +94,7 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                         (mp.getX() < endX) &&
                         (mp.getY() >= startY) &&
                         (mp.getY() < endY)) {
-                    toReturn[mp.getX()-startX][mp.getY()-startY] = mp.getCharacter().getAppearance();
+                    toReturn[mp.getX()-startX][mp.getY()-startY].add(mp.getCharacter().getAppearance());
                 }
             }
         }
@@ -102,13 +106,20 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
         synchronized (this) {
             for (MutablePlacement p : allCharacters) {
                 if (p.getCharacter().getName().equals(e.getCharacter().getName())) {
-                    p.setX(p.getX() + e.getDeltaX());
-                    p.setY(p.getY() + e.getDeltaY());
-                    return true;
+                    int newX = p.getX() + e.getDeltaX();
+                    int newY = p.getY() + e.getDeltaY();
+
+                    if (background[newX][newY].isImpassible()) {
+                        return false;
+                    } else {
+                        p.setX(newX);
+                        p.setY(newY);
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        return false;
     }
 
     @Override
