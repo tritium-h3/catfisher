@@ -52,7 +52,7 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
             client.consume(new ServerConnectionAcknowledged());
             SynchronizeEvent event;
             synchronized (trueModel) {
-                event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getBackground(), trueModel.copyCharacters());
+                event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getMap(), trueModel.copyCharacters());
             }
             client.consume(event);
         }
@@ -84,7 +84,7 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         synchronized(trueModel) {
             Collection<AbsoluteModel.MutablePlacement> placements = trueModel.copyCharacters();
             for (ProxyClient client : clients.values()) {
-                SynchronizeEvent event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getBackground(), placements);
+                SynchronizeEvent event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getMap(), placements);
                 toReturn.put(client, event);
             }
         }
