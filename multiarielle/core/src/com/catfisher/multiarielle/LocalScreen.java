@@ -25,7 +25,7 @@ public class LocalScreen implements Screen {
 
     LocalScreen(MultiArielle game) {
         this.game = game;
-        this.camera = new OrthographicCamera(640, 640);
+        this.camera = new OrthographicCamera(640, 360);
         this.atlas = game.getAtlas();
 
         this.localModel = game.getLocalModel();
@@ -51,10 +51,12 @@ public class LocalScreen implements Screen {
             log.error("Didn't find character, character should exist");
         }
         else {
-            log.debug("Translating camera to {}, {}", mp.getX(), mp.getY());
-            camera.position.x = mp.getX() * 32;
-            camera.position.y = mp.getY() * 32;
-            camera.update();
+            // TODO: Get rid of magic numbers
+            if (camera.position.x != mp.getX() * 32 || camera.position.y != mp.getY() * 32) {
+                camera.position.x += ((mp.getX() * 32 - camera.position.x) / 4);
+                camera.position.y += ((mp.getY() * 32 - camera.position.y) / 4);
+                camera.update();
+            }
         }
 
         game.getBatch().setProjectionMatrix(camera.combined);
