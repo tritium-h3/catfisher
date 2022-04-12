@@ -22,19 +22,14 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
     private Collection<MutablePlacement> allCharacters = new HashSet<>();
 
     @Getter
-    private List<List<Chunk>> map = new ArrayList<>(new ArrayList<>());
+    private Map<Integer, Map<Integer, Chunk>> map = new HashMap<>(new HashMap<>());
 
     public void loadBackground(String filename, int x, int y) throws IOException, IndexOutOfBoundsException {
-        if (y > map.size()) {
-            throw new IndexOutOfBoundsException();
+        if (map.get(y) == null) {
+            map.put(y, new HashMap<>());
         }
-        if (map.size() == y) {
-            map.add(new ArrayList<>());
-        }
-        if (x > map.get(y).size()) {
-            throw new IndexOutOfBoundsException();
-        }
-        map.get(y).add(Chunk.readFromFile(filename));
+
+        map.get(y).put(x, Chunk.readFromFile(filename));
     }
 
     @Data
@@ -90,6 +85,10 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                 if (p.getCharacter().getName().equals(e.getCharacter().getName())) {
                     int newX = p.getX() + e.getDeltaX();
                     int newY = p.getY() + e.getDeltaY();
+
+                    if (map.get(newY / 20) == null || map.get(newY / 20).get(newX / 20) == null) {
+                        return false;
+                    }
 
                     BackgroundTile[][] bgLayer = map.get(newX / 20).get(newY / 20).getBgLayer();
 
