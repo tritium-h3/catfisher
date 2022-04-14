@@ -93,7 +93,7 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                     BackgroundTile[][] bgLayer = map.get(newX / 20).get(newY / 20).getBgLayer();
 
                     // TODO: Bug involving out of bounds
-                    if ((bgLayer[newX % 20][newY % 20] == null) ||(bgLayer[newX % 20][newY % 20].isImpassible())) {
+                    if ((bgLayer[Math.floorMod(newX, 20)][Math.floorMod(newY, 20)] == null) ||(bgLayer[Math.floorMod(newX, 20)][Math.floorMod(newY, 20)].isImpassible())) {
                         return false;
                     } else {
                         p.setX(newX);
