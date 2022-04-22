@@ -55,14 +55,23 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
 
         synchronized (this) {
             for (int x = startX; x < endX; x++) {
+            	Map<Integer, Chunk> mapRow = map.get((int) Math.floor(x / 20));
+            	boolean isNullRow = (mapRow == null);
                 for (int y = startY; y < endY; y++) {
-                    // TODO: This 1 liner is horrible, clean it up
-                    if (map.get((int) Math.floor(x / 20)).get((int) Math.floor(y / 20)).getBgLayer()[x % 20][y % 20] == null) {
-                        toReturn[x-startX][y-startY] = new ArrayList<>();
-                        toReturn[x-startX][y-startY].add(Sprite.EMPTY);
+                    if  (isNullRow) {
+                    	toReturn[x-startX][y-startY] = new ArrayList<>();
+                    	toReturn[x-startX][y-startY].add(Sprite.EMPTY);
                     } else {
-                        toReturn[x-startX][y-startY] = new ArrayList<>();
-                        toReturn[x - startX][y - startY].add(map.get((int) Math.floor(x / 20)).get((int) Math.floor(y / 20)).getBgLayer()[x % 20][y % 20].getAppearance());
+                    	Chunk chunk = mapRow.get((int) Math.floor(x / 20));
+                    	if  (chunk == null) {
+                    		toReturn[x-startX][y-startY] = new ArrayList<>();
+                    		toReturn[x-startX][y-startY].add(Sprite.EMPTY);
+                    	}
+                    	else {
+                    		toReturn[x-startX][y-startY] = new ArrayList<>();
+                    		// TODO: One liner bad, make better
+                    		toReturn[x - startX][y - startY].add(map.get((int) Math.floor(x / 20)).get((int) Math.floor(y / 20)).getBgLayer()[Math.floorMod(x, 20)][Math.floorMod(y, 20)].getAppearance());
+                    	}
                     }
                 }
             }
@@ -86,10 +95,11 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                     int newX = p.getX() + e.getDeltaX();
                     int newY = p.getY() + e.getDeltaY();
 
-                    if (map.get(newY / 20) == null || map.get(newY / 20).get(newX / 20) == null) {
+                    if (map.get(newX / 20) == null || map.get(newX / 20).get(newY / 20) == null) {
                         return false;
                     }
-
+                   
+          
                     BackgroundTile[][] bgLayer = map.get(newX / 20).get(newY / 20).getBgLayer();
 
                     // TODO: Bug involving out of bounds

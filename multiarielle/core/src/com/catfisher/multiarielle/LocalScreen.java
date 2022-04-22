@@ -62,7 +62,7 @@ public class LocalScreen implements Screen {
         game.getBatch().setProjectionMatrix(camera.combined);
         game.getBatch().begin();
 
-        List<Sprite>[][] placements = localModel.getSpritePlacements(0, 0, 20, 20);
+        List<Sprite>[][] placements = localModel.getSpritePlacements(0, -20, 20, 20);
         for (int x = 0; x < 20; x++) {
             for (int y = 0; y < 20; y++) {
                 for (Sprite sprite : placements[x][y]) {

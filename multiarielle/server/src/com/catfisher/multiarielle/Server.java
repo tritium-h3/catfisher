@@ -11,6 +11,7 @@ public class Server {
     public static void main (String[] arg) throws Exception {
         ModelServer server = new ModelServer();
         server.getTrueModel().loadBackground("bg.csv",0, 0);
+        server.getTrueModel().loadBackground("bg.csv",0, -1);
         int port = 8080;
         if (arg.length > 0) {
             port = Integer.parseInt(arg[0]);
