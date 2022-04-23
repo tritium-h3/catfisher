@@ -2,7 +2,10 @@ package com.catfisher.multiarielle;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.catfisher.multiarielle.clientServer.ModelClient;
 import com.catfisher.multiarielle.clientServer.ProxyServer;
 import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
@@ -27,6 +30,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -51,8 +55,21 @@ public class MultiArielle extends Game {
 	@Getter
 	private Character hero;
 
+	@Getter
+	private BitmapFont charterBody;
+	@Getter
+	private BitmapFont charterHead;
+
 	@Override
 	public void create ()  {
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Charter Regular.ttf"));
+		FreeTypeFontGenerator.FreeTypeFontParameter body = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		body.size = 15;
+		charterBody = generator.generateFont(body);
+		FreeTypeFontGenerator.FreeTypeFontParameter head = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		head.size = 15;
+		charterHead = generator.generateFont(head);
+
 		batch = new SpriteBatch();
 		atlas = new SpriteAtlas();
 		hero = new Character(Sprite.HERO, UUID.randomUUID().toString());
@@ -74,9 +91,13 @@ public class MultiArielle extends Game {
 		localModel.consume(new CharacterAddDelta(hero, 10, 10));
 		keyboardController = new KeyboardController(hero, localModel);
 
-		Gdx.input.setInputProcessor(keyboardController);
+		LocalScreen screen = new LocalScreen(this);
 
-		this.setScreen(new LocalScreen(this));
+		InputMultiplexer multiplexer = new InputMultiplexer(keyboardController, screen.getStage());
+
+		Gdx.input.setInputProcessor(multiplexer);
+
+		this.setScreen(screen);
 	}
 
 	public void setupServerConn(ProxyServer server) {

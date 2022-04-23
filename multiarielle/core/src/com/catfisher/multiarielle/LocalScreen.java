@@ -1,16 +1,26 @@
 package com.catfisher.multiarielle;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.catfisher.multiarielle.model.AbsoluteModel;
 import com.catfisher.multiarielle.model.LocalModel;
 import com.catfisher.multiarielle.model.Model;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.sprite.SpriteAtlas;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.List;
@@ -18,17 +28,44 @@ import java.util.List;
 @Log4j2
 public class LocalScreen implements Screen {
 
+    private static Drawable singleColorDrawable(Color color) {
+        Pixmap bgPixmap = new Pixmap(1,1, Pixmap.Format.RGBA8888);
+        bgPixmap.setColor(color);
+        bgPixmap.fill();
+        return new TextureRegionDrawable(new TextureRegion(new Texture(bgPixmap)));
+    }
+
+    public final static Drawable BACKGROUND = singleColorDrawable(new Color(0.0f, 0.0f, 0.0f, 0.50f));
+
     final MultiArielle game;
     final OrthographicCamera camera;
     final LocalModel localModel;
     final SpriteAtlas atlas;
 
+    @Getter
+    private Stage stage;
+    private TextField messageArea;
+    private Table layoutTable;
+
+    boolean inChat = false;
+
     LocalScreen(MultiArielle game) {
         this.game = game;
-        this.camera = new OrthographicCamera(640, 360);
         this.atlas = game.getAtlas();
 
         this.localModel = game.getLocalModel();
+
+        stage = new Stage();
+        layoutTable = new Table();
+        layoutTable.setFillParent(true);
+        stage.addActor(layoutTable);
+
+        messageArea = new TextField("Hello World", new TextField.TextFieldStyle(game.getCharterBody(), Color.WHITE, null, null, BACKGROUND));
+        layoutTable.add(messageArea).expandY().growX().bottom();
+
+        stage.setKeyboardFocus(messageArea);
+
+        this.camera = new OrthographicCamera(640, 360);
     }
 
     @Override
@@ -37,6 +74,8 @@ public class LocalScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        stage.draw();
+
         ScreenUtils.clear(Color.BLACK);
 
         AbsoluteModel.MutablePlacement mp = null;
@@ -59,8 +98,8 @@ public class LocalScreen implements Screen {
             }
         }
 
-        game.getBatch().setProjectionMatrix(camera.combined);
-        game.getBatch().begin();
+        stage.getBatch().setProjectionMatrix(camera.combined);
+        stage.getBatch().begin();
 
         int range = 12;
         int playerX = mp.getX();
@@ -73,19 +112,21 @@ public class LocalScreen implements Screen {
         for (int x = startX; x < endX; x++) {
             for (int y = startY; y < endY; y++) {
                 for (Sprite sprite : placements[x - startX][y - startY]) {
-                    game.getBatch().draw(atlas.getTextureRegion(sprite), x * 32, y * 32);
+                    stage.getBatch().draw(atlas.getTextureRegion(sprite), x * 32, y * 32);
                 }
             }
         }
 
+        stage.getBatch().end();
 
-        game.getBatch().end();
+        stage.draw();
+
     }
 
 
     @Override
     public void resize(int width, int height) {
-
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -105,7 +146,7 @@ public class LocalScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
     }
 
 }

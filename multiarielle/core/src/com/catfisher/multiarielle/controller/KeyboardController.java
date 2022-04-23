@@ -14,6 +14,8 @@ public class KeyboardController implements InputProcessor {
     private final DeltaConsumer consumer;
     private final Map<Integer, Delta> keyMap = new HashMap<>();
 
+    private boolean isInChat;
+
     public KeyboardController(Character hero, DeltaConsumer consumer) {
         this.hero = hero;
         this.consumer = consumer;
@@ -30,9 +32,19 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+        if (isInChat) {
+            if (keycode == Input.Keys.ENTER) {
+                isInChat = false;
+            }
+            return false;
+        }
+        if (keycode == Input.Keys.T) {
+            isInChat = true;
+            return true;
+        }
         Delta delta = keyMap.get(keycode);
         if (null == delta) {
-            return false;
+            return true;
         } else {
             consumer.consume(delta);
             return true;
@@ -41,7 +53,7 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean keyTyped(char character) {
-        return false;
+        return !isInChat;
     }
 
     @Override
