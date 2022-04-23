@@ -62,7 +62,7 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                     	toReturn[x-startX][y-startY] = new ArrayList<>();
                     	toReturn[x-startX][y-startY].add(Sprite.EMPTY);
                     } else {
-                    	Chunk chunk = mapRow.get((int) Math.floor(x / 20));
+                    	Chunk chunk = mapRow.get((int) Math.floor(y / 20));
                     	if  (chunk == null) {
                     		toReturn[x-startX][y-startY] = new ArrayList<>();
                     		toReturn[x-startX][y-startY].add(Sprite.EMPTY);

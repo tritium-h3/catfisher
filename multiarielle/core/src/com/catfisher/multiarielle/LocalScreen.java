@@ -64,7 +64,7 @@ public class LocalScreen implements Screen {
 
         List<Sprite>[][] placements = localModel.getSpritePlacements(0, -20, 20, 20);
         for (int x = 0; x < 20; x++) {
-            for (int y = 0; y < 20; y++) {
+            for (int y = 0; y < 40; y++) {
                 for (Sprite sprite : placements[x][y]) {
                     game.getBatch().draw(atlas.getTextureRegion(sprite), x * 32, y * 32);
                 }
