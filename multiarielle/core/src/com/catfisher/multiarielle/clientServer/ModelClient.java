@@ -1,5 +1,6 @@
 package com.catfisher.multiarielle.clientServer;
 
+import com.catfisher.multiarielle.clientServer.event.client.ClientChatEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
 import com.catfisher.multiarielle.clientServer.event.server.*;
@@ -105,5 +106,9 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
         long thisSequenceNumber = sequenceNumber.incrementAndGet();
         unacknowledgedDeltas.put(thisSequenceNumber, delta);
         return server.receive(new ClientDeltaEvent(clientId, thisSequenceNumber, delta));
+    }
+
+    public boolean forwardChatToServer(String message) {
+        return server.receive(new ClientChatEvent(clientId, message));
     }
 }

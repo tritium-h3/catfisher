@@ -68,6 +68,20 @@ public class LocalScreen implements Screen {
         this.camera = new OrthographicCamera(640, 360);
     }
 
+    public MessageHolder getMessageHolder() {
+        return new MessageHolder() {
+            @Override
+            public String getCurrentMessage() {
+                return messageArea.getText();
+            }
+
+            @Override
+            public void clearMessage() {
+                messageArea.setText("");
+            }
+        };
+    }
+
     @Override
     public void show() {
     }

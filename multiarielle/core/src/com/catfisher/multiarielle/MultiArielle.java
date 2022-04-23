@@ -89,9 +89,10 @@ public class MultiArielle extends Game {
 		}
 
 		localModel.consume(new CharacterAddDelta(hero, 10, 10));
-		keyboardController = new KeyboardController(hero, localModel);
 
 		LocalScreen screen = new LocalScreen(this);
+		ChatHandler chatHandler = new ChatHandler(screen.getMessageHolder(), client);
+		keyboardController = new KeyboardController(hero, localModel, chatHandler);
 
 		InputMultiplexer multiplexer = new InputMultiplexer(keyboardController, screen.getStage());
 

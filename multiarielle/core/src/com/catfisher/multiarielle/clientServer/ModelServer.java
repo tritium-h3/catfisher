@@ -1,9 +1,6 @@
 package com.catfisher.multiarielle.clientServer;
 
-import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
-import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
-import com.catfisher.multiarielle.clientServer.event.client.ClientEventVisitor;
-import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
+import com.catfisher.multiarielle.clientServer.event.client.*;
 import com.catfisher.multiarielle.clientServer.event.server.ServerConnectionAcknowledged;
 import com.catfisher.multiarielle.clientServer.event.server.ServerDeltaEvent;
 import com.catfisher.multiarielle.clientServer.event.server.ServerRejectDeltaEvent;
@@ -124,6 +121,12 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
             sender.consume(new ServerRejectDeltaEvent(e.getSequenceNumber()));
             return false;
         }
+    }
+
+    @Override
+    public Boolean visit(ClientChatEvent e) {
+        log.info("[{}]: {}", e.getClientId(), e.getMessage());
+        return true;
     }
 
     public Boolean consume(ClientEvent e) {

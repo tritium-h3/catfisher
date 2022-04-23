@@ -2,6 +2,7 @@ package com.catfisher.multiarielle.controller;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.catfisher.multiarielle.ChatHandler;
 import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.controller.delta.MoveDelta;
 import com.catfisher.multiarielle.model.Character;
@@ -12,13 +13,13 @@ import java.util.Map;
 public class KeyboardController implements InputProcessor {
     private final Character hero;
     private final DeltaConsumer consumer;
+    private final ChatHandler chatHandler;
     private final Map<Integer, Delta> keyMap = new HashMap<>();
 
-    private boolean isInChat;
-
-    public KeyboardController(Character hero, DeltaConsumer consumer) {
+    public KeyboardController(Character hero, DeltaConsumer consumer, ChatHandler chatHandler) {
         this.hero = hero;
         this.consumer = consumer;
+        this.chatHandler = chatHandler;
         keyMap.put(Input.Keys.UP, new MoveDelta(hero, 0, 1));
         keyMap.put(Input.Keys.DOWN, new MoveDelta(hero, 0, -1));
         keyMap.put(Input.Keys.RIGHT, new MoveDelta(hero, 1, 0));
@@ -32,14 +33,15 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (isInChat) {
+        if (chatHandler.isInChat()) {
             if (keycode == Input.Keys.ENTER) {
-                isInChat = false;
+                chatHandler.acceptChatMessage();
+                return true;
             }
             return false;
         }
         if (keycode == Input.Keys.T) {
-            isInChat = true;
+            chatHandler.startChatting();
             return true;
         }
         Delta delta = keyMap.get(keycode);
@@ -53,7 +55,7 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean keyTyped(char character) {
-        return !isInChat;
+        return !chatHandler.isInChat();
     }
 
     @Override

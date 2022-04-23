@@ -12,6 +12,7 @@ import lombok.*;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ConnectEvent.class, name = "ConnectEvent"),
         @JsonSubTypes.Type(value = ClientDeltaEvent.class, name = "ClientDeltaEvent"),
+        @JsonSubTypes.Type(value = ClientChatEvent.class, name = "ClientChatEvent"),
 })
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
