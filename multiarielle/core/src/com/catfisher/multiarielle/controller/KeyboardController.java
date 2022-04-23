@@ -28,6 +28,12 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
+        if (!chatHandler.isInChat()) {
+            if (keycode == Input.Keys.T) {
+                chatHandler.startChatting();
+            }
+            return true;
+        }
         return false;
     }
 
@@ -39,10 +45,6 @@ public class KeyboardController implements InputProcessor {
                 return true;
             }
             return false;
-        }
-        if (keycode == Input.Keys.T) {
-            chatHandler.startChatting();
-            return true;
         }
         Delta delta = keyMap.get(keycode);
         if (null == delta) {

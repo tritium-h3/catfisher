@@ -3,16 +3,15 @@ package com.catfisher.multiarielle;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.assets.loaders.SkinLoader;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.catfisher.multiarielle.model.AbsoluteModel;
@@ -59,8 +58,11 @@ public class LocalScreen implements Screen {
         layoutTable = new Table();
         layoutTable.setFillParent(true);
         stage.addActor(layoutTable);
-
-        messageArea = new TextField("Hello World", new TextField.TextFieldStyle(game.getCharterBody(), Color.WHITE, null, null, BACKGROUND));
+        Skin skin = new Skin(Gdx.files.internal("cloud-skin/cloud-form-ui.json"));
+        TextField.TextFieldStyle style = skin.get("default", TextField.TextFieldStyle.class);
+        style.background = singleColorDrawable(new Color(1f,1f, 1f, 0.2f));
+        style.focusedBackground = singleColorDrawable(new Color(1f,1f, 1f, 0.2f));
+        messageArea = new TextField("Hello World", style);
         layoutTable.add(messageArea).expandY().growX().bottom();
 
         stage.setKeyboardFocus(messageArea);
