@@ -1,11 +1,15 @@
 package com.catfisher.multiarielle.model;
 
+import com.badlogic.gdx.math.Vector2;
 import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.delta.*;
 import com.catfisher.multiarielle.sprite.Sprite;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -22,14 +26,10 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
     private Collection<MutablePlacement> allCharacters = new HashSet<>();
 
     @Getter
-    private Map<Integer, Map<Integer, Chunk>> map = new HashMap<>(new HashMap<>());
+    private Map<Chunk.Address, Chunk> map = new HashMap<>();
 
     public void loadBackground(String filename, int x, int y) throws IOException, IndexOutOfBoundsException {
-        if (map.get(y) == null) {
-            map.put(y, new HashMap<>());
-        }
-
-        map.get(y).put(x, Chunk.readFromFile(filename));
+        map.put(Chunk.Address.ofAbsoluteCoords(x, y), Chunk.readFromFile(filename));
     }
 
     @Data
@@ -55,23 +55,17 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
 
         synchronized (this) {
             for (int x = startX; x < endX; x++) {
-            	Map<Integer, Chunk> mapRow = map.get((int) Math.floor(x / 20));
-            	boolean isNullRow = (mapRow == null);
                 for (int y = startY; y < endY; y++) {
-                    if  (isNullRow) {
-                    	toReturn[x-startX][y-startY] = new ArrayList<>();
-                    	toReturn[x-startX][y-startY].add(Sprite.EMPTY);
+                    Chunk.Address chunkAddress = Chunk.Address.ofAbsoluteCoords(x, y);
+                    Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(x, y);
+                    Chunk chunk = map.get(chunkAddress);
+                    if  (chunk == null) {
+                        toReturn[x-startX][y-startY] = new ArrayList<>();
+                        toReturn[x-startX][y-startY].add(Sprite.EMPTY);
                     } else {
-                    	Chunk chunk = mapRow.get((int) Math.floor(y / 20));
-                    	if  (chunk == null) {
-                    		toReturn[x-startX][y-startY] = new ArrayList<>();
-                    		toReturn[x-startX][y-startY].add(Sprite.EMPTY);
-                    	}
-                    	else {
-                    		toReturn[x-startX][y-startY] = new ArrayList<>();
-                    		// TODO: One liner bad, make better
-                    		toReturn[x - startX][y - startY].add(map.get((int) Math.floor(x / 20)).get((int) Math.floor(y / 20)).getBgLayer()[Math.floorMod(x, 20)][Math.floorMod(y, 20)].getAppearance());
-                    	}
+                        toReturn[x-startX][y-startY] = new ArrayList<>();
+                        toReturn[x - startX][y - startY].add(map.get(chunkAddress).
+                                getBgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].getAppearance());
                     }
                 }
             }
@@ -95,15 +89,17 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                     int newX = p.getX() + e.getDeltaX();
                     int newY = p.getY() + e.getDeltaY();
 
-                    if (map.get(newX / 20) == null || map.get(newX / 20).get(newY / 20) == null) {
+                    Chunk.Address newAddress = Chunk.Address.ofAbsoluteCoords(newX, newY);
+                    if (map.get(newAddress) == null) {
                         return false;
                     }
-                   
-          
-                    BackgroundTile[][] bgLayer = map.get(newX / 20).get(newY / 20).getBgLayer();
+
+                    BackgroundTile[][] bgLayer = map.get(newAddress).getBgLayer();
 
                     // TODO: Bug involving out of bounds
-                    if ((bgLayer[Math.floorMod(newX, 20)][Math.floorMod(newY, 20)] == null) ||(bgLayer[Math.floorMod(newX, 20)][Math.floorMod(newY, 20)].isImpassible())) {
+                    Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(newX, newY);
+                    if ((bgLayer[chunkOffset.getLeft()][chunkOffset.getRight()] == null) ||
+                            (bgLayer[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible())) {
                         return false;
                     } else {
                         p.setX(newX);
