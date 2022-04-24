@@ -28,7 +28,7 @@ public class ProxyClient {
     private final AtomicLong sequenceNumberWatermark = new AtomicLong(0);
 
     public Boolean consume(ServerEvent e) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
         try {
             String eventToSend = objectMapper.writeValueAsString(e);

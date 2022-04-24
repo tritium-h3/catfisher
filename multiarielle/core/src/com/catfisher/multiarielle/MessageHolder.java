@@ -1,6 +1,8 @@
 package com.catfisher.multiarielle;
 
 public interface MessageHolder {
-    String getCurrentMessage();
+    String readAndUnfocus();
     void clearMessage();
+    void focus();
+    void receiveMessage(String message);
 }

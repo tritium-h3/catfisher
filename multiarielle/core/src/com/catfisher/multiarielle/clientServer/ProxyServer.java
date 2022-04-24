@@ -20,6 +20,7 @@ public class ProxyServer extends SimpleChannelInboundHandler<String> {
 
     ModelClient client;
     ChannelHandlerContext conn;
+    ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     public void setupClient(ModelClient client) {
         this.client = client;
@@ -27,7 +28,6 @@ public class ProxyServer extends SimpleChannelInboundHandler<String> {
 
     public boolean receive(ClientEvent e) {
         synchronized (this) {
-            ObjectMapper objectMapper = new ObjectMapper();
             try {
                 String serialized = objectMapper.writeValueAsString(e);
                 log.debug("Serialized into {}", serialized);
@@ -49,8 +49,6 @@ public class ProxyServer extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ServerEvent event = objectMapper.readValue(msg, ServerEvent.class);
             log.info("Event received: {}", event);
 

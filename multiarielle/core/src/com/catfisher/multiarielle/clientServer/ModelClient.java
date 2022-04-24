@@ -1,5 +1,6 @@
 package com.catfisher.multiarielle.clientServer;
 
+import com.catfisher.multiarielle.MessageHolder;
 import com.catfisher.multiarielle.clientServer.event.client.ClientChatEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
@@ -7,8 +8,13 @@ import com.catfisher.multiarielle.clientServer.event.server.*;
 import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.model.AbsoluteModel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +28,8 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
     private ProxyServer server;
     @Getter
     private final String clientId;
+    @Setter
+    private MessageHolder messageHolder = null;
 
     @Getter
     private final AtomicBoolean isServerReady = new AtomicBoolean(false);
@@ -90,6 +98,16 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
             }
         }
         return true;
+    }
+
+    @Override
+    public Boolean visit(ServerChatEvent e) {
+        if (messageHolder != null) {
+            messageHolder.receiveMessage(String.format("%tc: <%s> %s", ZonedDateTime.ofInstant(e.getTimestamp(), ZoneId.systemDefault()), e.getSender(), e.getMessage()));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void waitForServerReady() throws InterruptedException {

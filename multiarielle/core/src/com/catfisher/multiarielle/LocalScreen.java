@@ -34,8 +34,6 @@ public class LocalScreen implements Screen {
         return new TextureRegionDrawable(new TextureRegion(new Texture(bgPixmap)));
     }
 
-    public final static Drawable BACKGROUND = singleColorDrawable(new Color(0.0f, 0.0f, 0.0f, 0.50f));
-
     final MultiArielle game;
     final OrthographicCamera camera;
     final LocalModel localModel;
@@ -44,9 +42,30 @@ public class LocalScreen implements Screen {
     @Getter
     private Stage stage;
     private TextField messageArea;
+    private ServerTextArea serverTextArea;
     private Table layoutTable;
 
-    boolean inChat = false;
+    private static class ServerTextArea {
+        private final Label[] labelBox;
+        private final int rows;
+
+        public ServerTextArea(Table layout, Label.LabelStyle style, int rows) {
+            this.rows = rows;
+            labelBox = new Label[rows];
+            for (int row = rows - 1; row >= 0; row--) {
+                labelBox[row] = new Label("*row " + row + "*", style);
+                layout.add(labelBox[row]).growX().bottom();
+                layout.row().expandX();
+            }
+        }
+
+        public void addMessage(String message) {
+            for(int row = rows - 1; row > 0; row--) {
+                labelBox[row].setText(labelBox[row - 1].getText());
+            }
+            labelBox[0].setText(message);
+        }
+    }
 
     LocalScreen(MultiArielle game) {
         this.game = game;
@@ -55,17 +74,32 @@ public class LocalScreen implements Screen {
         this.localModel = game.getLocalModel();
 
         stage = new Stage();
+
         layoutTable = new Table();
         layoutTable.setFillParent(true);
+        layoutTable.pad(15f);
         stage.addActor(layoutTable);
-        Skin skin = new Skin(Gdx.files.internal("cloud-skin/cloud-form-ui.json"));
-        TextField.TextFieldStyle style = skin.get("default", TextField.TextFieldStyle.class);
-        style.background = singleColorDrawable(new Color(1f,1f, 1f, 0.2f));
-        style.focusedBackground = singleColorDrawable(new Color(1f,1f, 1f, 0.2f));
-        messageArea = new TextField("Hello World", style);
-        layoutTable.add(messageArea).expandY().growX().bottom();
 
-        stage.setKeyboardFocus(messageArea);
+        Skin skin = new Skin(Gdx.files.internal("cloud-skin/cloud-form-ui.json"));
+        TextField.TextFieldStyle tfs = skin.get("default", TextField.TextFieldStyle.class);
+
+        tfs.background = singleColorDrawable(new Color(1f,1f, 1f, 0.2f));
+        tfs.focusedBackground = singleColorDrawable(new Color(1f,1f, 1f, 0.5f));
+        tfs.background.setLeftWidth(tfs.background.getLeftWidth() + 5);
+        tfs.background.setRightWidth(tfs.background.getRightWidth() + 5);
+        tfs.focusedBackground.setLeftWidth(tfs.focusedBackground.getLeftWidth() + 5);
+        tfs.focusedBackground.setRightWidth(tfs.focusedBackground.getRightWidth() + 5);
+
+        Label.LabelStyle ls = skin.get("default", Label.LabelStyle.class);
+        ls.background = singleColorDrawable(new Color(1f,1f, 1f, 0.2f));
+        ls.background.setLeftWidth(ls.background.getLeftWidth() + 5);
+        ls.background.setRightWidth(ls.background.getRightWidth() + 5);
+
+        layoutTable.row().expandX().expandY();
+        serverTextArea = new ServerTextArea(layoutTable, ls, 3);
+        messageArea = new TextField("Hello World", tfs);
+        layoutTable.add(messageArea).growX().bottom();
+
 
         this.camera = new OrthographicCamera(640, 360);
     }
@@ -73,13 +107,25 @@ public class LocalScreen implements Screen {
     public MessageHolder getMessageHolder() {
         return new MessageHolder() {
             @Override
-            public String getCurrentMessage() {
+            public String readAndUnfocus() {
+                stage.unfocus(messageArea);
                 return messageArea.getText();
             }
 
             @Override
             public void clearMessage() {
                 messageArea.setText("");
+            }
+
+            @Override
+            public void focus() {
+                stage.setKeyboardFocus(messageArea);
+            }
+
+            @Override
+            public void receiveMessage(String message) {
+                serverTextArea.addMessage(message);
+                log.debug("Displaying text {}", message);
             }
         };
     }

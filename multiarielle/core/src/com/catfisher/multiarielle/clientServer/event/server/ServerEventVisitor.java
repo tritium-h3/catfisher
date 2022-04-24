@@ -7,4 +7,5 @@ public interface ServerEventVisitor<Response> {
     Response visit(SynchronizeEvent e);
     Response visit(ServerConnectionAcknowledged e);
     Response visit(ServerRejectDeltaEvent e);
+    Response visit(ServerChatEvent e);
 }

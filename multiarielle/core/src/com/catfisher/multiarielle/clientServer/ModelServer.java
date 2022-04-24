@@ -1,11 +1,8 @@
 package com.catfisher.multiarielle.clientServer;
 
 import com.catfisher.multiarielle.clientServer.event.client.*;
-import com.catfisher.multiarielle.clientServer.event.server.ServerConnectionAcknowledged;
-import com.catfisher.multiarielle.clientServer.event.server.ServerDeltaEvent;
-import com.catfisher.multiarielle.clientServer.event.server.ServerRejectDeltaEvent;
+import com.catfisher.multiarielle.clientServer.event.server.*;
 import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
-import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
 import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.model.AbsoluteModel;
@@ -14,6 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -125,7 +123,10 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
 
     @Override
     public Boolean visit(ClientChatEvent e) {
-        log.info("[{}]: {}", e.getClientId(), e.getMessage());
+        Instant chatTimeStamp = Instant.now();
+        for (ProxyClient client : clients.values()) {
+            client.consume(new ServerChatEvent(e.getClientId(), e.getMessage(), chatTimeStamp));
+        }
         return true;
     }
 

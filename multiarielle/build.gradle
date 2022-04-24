@@ -94,5 +94,6 @@ project(":core") {
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.1'
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.1'
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2'
     }
 }
