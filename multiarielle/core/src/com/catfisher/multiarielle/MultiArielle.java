@@ -28,14 +28,25 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
+import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Log4j2
 public class MultiArielle extends Game {
+	@Value
+	static
+	class ConnectionConfiguration {
+		String username;
+		String password;
+		String address;
+		int port;
+	}
+	
 	EventLoopGroup workerGroup;
 	@Getter
 	private SpriteBatch batch;
@@ -59,9 +70,14 @@ public class MultiArielle extends Game {
 	private BitmapFont charterBody;
 	@Getter
 	private BitmapFont charterHead;
-
+	
 	@Override
-	public void create ()  {
+	public void create() {
+		MainMenuScreen screen = new MainMenuScreen(this, "");
+		this.setScreen(screen);
+	}
+	
+	public void runGame(ConnectionConfiguration config)  {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Charter Regular.ttf"));
 		FreeTypeFontGenerator.FreeTypeFontParameter body = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		body.size = 15;
@@ -69,23 +85,37 @@ public class MultiArielle extends Game {
 		FreeTypeFontGenerator.FreeTypeFontParameter head = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		head.size = 15;
 		charterHead = generator.generateFont(head);
-
+		
 		batch = new SpriteBatch();
 		atlas = new SpriteAtlas();
 		hero = new Character(Sprite.HERO, UUID.randomUUID().toString());
 
 		localModel = new LocalModel();
 		server = new ProxyServer();
-		client = new ModelClient(localModel.getLocalModel());
-		setupServerConn(server);
+		client = new ModelClient(config.getUsername(), localModel.getLocalModel());
+		try {
+			setupServerConn(server, config);
+		}
+		catch (ConnectException e) {
+			MainMenuScreen screen = new MainMenuScreen(this, "Connection refused.");
+			this.setScreen(screen);
+			return;
+		}
 		localModel.associateClient(client);
-		client.associateServer(server);
+		client.associateServer(server, config.getPassword());
 
 		try {
 			client.waitForServerReady();
-		} catch (InterruptedException exn) {
+ 		} catch (InterruptedException exn) {
 			log.info("Interrupted while waiting for server to be ready", exn);
 			System.exit(0);
+		}
+
+		if (client.getDidServerReject().get()) {
+			log.info("Server rejected.");
+			MainMenuScreen screen = new MainMenuScreen(this, client.getError());
+			this.setScreen(screen);
+			return;
 		}
 
 		localModel.consume(new CharacterAddDelta(hero, 10, 10));
@@ -102,7 +132,7 @@ public class MultiArielle extends Game {
 		this.setScreen(screen);
 	}
 
-	public void setupServerConn(ProxyServer server) {
+	public void setupServerConn(ProxyServer server, ConnectionConfiguration config) throws ConnectException {
 		workerGroup = new NioEventLoopGroup();
 		try {
 			Bootstrap b = new Bootstrap();
@@ -121,7 +151,7 @@ public class MultiArielle extends Game {
 			});
 
 			// Start the client.
-			ChannelFuture f = b.connect("localhost", 8080).sync(); // (5)
+			ChannelFuture f = b.connect(config.getAddress(), config.getPort()).sync(); // (5)
 			f.await();
 
 		} catch (InterruptedException e) {

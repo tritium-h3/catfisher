@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Log4j2
 public class ModelServer implements ClientEventVisitor<Boolean> {
+    String password;
     @Getter
     private final AbsoluteModel trueModel;
     private final Map<String, ProxyClient> clients = new HashMap<>();
@@ -32,11 +33,13 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
                 if (toRemove != null) {
                     applyDelta(client.getClientId(), new CharacterRemoveDelta(toRemove));
                 }
+                clientCharacters.remove(client.getClientId());
             }
         }
     }
 
-    public ModelServer() {
+    public ModelServer(String password) {
+        this.password = password;
         trueModel = new AbsoluteModel();
     }
 
@@ -56,7 +59,17 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
 
     @Override
     public Boolean visit(ConnectEvent e) {
+        log.info("Logging in client {}", e.getClientId());
         ProxyClient client = new ProxyClient(e.getClientId(), e.getCtx());
+        if (clients.containsKey(e.getClientId())) {
+            client.consume(new ServerConnectionRejected("User with same name logged in"));
+            return true;
+        }
+        else if (!e.getPassword().equals(password)) {
+            client.consume(new ServerConnectionRejected("Password is incorrect"));
+            return true;
+        }
+
         addClient(client);
         return true;
     }

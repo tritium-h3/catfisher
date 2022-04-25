@@ -8,4 +8,5 @@ public interface ServerEventVisitor<Response> {
     Response visit(ServerConnectionAcknowledged e);
     Response visit(ServerRejectDeltaEvent e);
     Response visit(ServerChatEvent e);
+    Response visit(ServerConnectionRejected e);
 }

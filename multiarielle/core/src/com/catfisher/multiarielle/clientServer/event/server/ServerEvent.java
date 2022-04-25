@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
         @JsonSubTypes.Type(value = SynchronizeEvent.class, name = "SynchronizeEvent"),
         @JsonSubTypes.Type(value = ServerConnectionAcknowledged.class, name = "ServerConnectionAcknowledged"),
         @JsonSubTypes.Type(value = ServerChatEvent.class, name = "ServerChatEvent"),
+        @JsonSubTypes.Type(value = ServerConnectionRejected.class, name = "ServerConnectionRejected"),
+        @JsonSubTypes.Type(value = ServerRejectDeltaEvent.class, name = "ServerRejectDeltaEvent")
 })
 @NoArgsConstructor
 public abstract class ServerEvent extends Event {

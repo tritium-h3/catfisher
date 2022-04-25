@@ -6,13 +6,20 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.Scanner;
+
 @Log4j2
 public class Server {
     public static void main (String[] arg) throws Exception {
-        ModelServer server = new ModelServer();
+        System.out.print("password> ");
+        Scanner scanner = new Scanner(System.in);
+        String pass = scanner.nextLine();
+        log.info(pass);
+        ModelServer server = new ModelServer(pass);
         server.getTrueModel().loadBackground("bg.csv",0, 0);
         server.getTrueModel().loadBackground("bg.csv",0, -1);
-        int port = 8080;
+        System.out.print("port> ");
+        int port = Integer.parseInt(scanner.nextLine());
         if (arg.length > 0) {
             port = Integer.parseInt(arg[0]);
         }

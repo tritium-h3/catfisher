@@ -33,20 +33,24 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
 
     @Getter
     private final AtomicBoolean isServerReady = new AtomicBoolean(false);
+    @Getter
+    private final AtomicBoolean didServerReject = new AtomicBoolean(false);
+    @Getter
+    private String error = "";
 
     private Map<Long, Delta> unacknowledgedDeltas = new HashMap<>();
 
     private final AtomicLong sequenceNumber = new AtomicLong(0);
 
-    public ModelClient(AbsoluteModel localCopy) {
+    public ModelClient(String clientId, AbsoluteModel localCopy) {
         this.localCopy = localCopy;
-        this.clientId = UUID.randomUUID().toString();
+        this.clientId = clientId;
     }
 
-    public void associateServer(ProxyServer server) {
+    public void associateServer(ProxyServer server, String password) {
         this.server = server;
         server.setupClient(this);
-        server.receive(new ConnectEvent(this.clientId, null));
+        server.receive(new ConnectEvent(this.clientId, password,null));
     }
 
     public Boolean consume(ServerEvent e) {
@@ -64,7 +68,7 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
         log.info("Client received from server event {}", e);
         localCopy.synchronize(e);
 
-        // Now replay all of the events that happened after the sync
+        // Now replay all the events that happened after the sync
         Map<Long, Delta> newUnacknowledgedDeltas = new HashMap<>();
         long sequenceNumberWatermark = e.getSequenceNumberWatermark();
         for (Map.Entry<Long, Delta> candidateDelta : unacknowledgedDeltas.entrySet()) {
@@ -81,6 +85,7 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
     public Boolean visit(ServerConnectionAcknowledged e) {
         log.info("Received ack {}", e);
         synchronized (isServerReady) {
+            didServerReject.set(false);
             isServerReady.set(true);
             isServerReady.notifyAll();
         }
@@ -108,6 +113,17 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public Boolean visit(ServerConnectionRejected e) {
+        synchronized (isServerReady) {
+            error = e.getMessage();
+            didServerReject.set(true);
+            isServerReady.set(true);
+            isServerReady.notifyAll();
+        }
+        return true;
     }
 
     public void waitForServerReady() throws InterruptedException {

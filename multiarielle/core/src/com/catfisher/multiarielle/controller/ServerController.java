@@ -3,6 +3,7 @@ package com.catfisher.multiarielle.controller;
 import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
+import com.catfisher.multiarielle.clientServer.event.server.ServerConnectionRejected;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.ServerBootstrap;
@@ -37,10 +38,8 @@ public class ServerController extends SimpleChannelInboundHandler<String> {
         server.removeClient(ctx);
     }
 
-    private void consume(ClientEvent e) {
-        if (!server.consume(e)) {
-            // TODO error handling
-        }
+    private boolean consume(ClientEvent e) {
+        return server.consume(e);
     }
 
     @Override
@@ -54,8 +53,11 @@ public class ServerController extends SimpleChannelInboundHandler<String> {
             ConnectEvent newConnect;
             log.info("Received event {}", e);
             if (e instanceof ConnectEvent) {
-                newConnect = new ConnectEvent(e.getClientId(), ctx);
-                consume(newConnect);
+                newConnect = new ConnectEvent(e.getClientId(), ((ConnectEvent) e).getPassword(), ctx);
+                if (!consume(newConnect)) {
+                    String toSend = objectMapper.writeValueAsString(new ServerConnectionRejected("Username already logged in."));
+                    ctx.writeAndFlush(toSend + "\n");
+                }
             } else {
                 consume(e);
             }
