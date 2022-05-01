@@ -22,7 +22,7 @@ public class MainMenuScreen implements Screen {
     private TextField port;
     private Button button;
 
-    MainMenuScreen(MultiArielle game, String error) {
+    MainMenuScreen(MultiArielle game, String error, MultiArielle.ConnectionConfiguration defaultConfiguration) {
         this.game = game;
 
         TextureAtlas atlas = new TextureAtlas("cloud-skin/cloud-form-ui.atlas");
@@ -40,25 +40,25 @@ public class MainMenuScreen implements Screen {
         TextField.TextFieldStyle tfs = skin.get("default", TextField.TextFieldStyle.class);
 
         Label label = new Label("Username", ls);
-        username = new TextField("", tfs);
+        username = new TextField(defaultConfiguration.getUsername(), tfs);
         mainTable.add(label);
         mainTable.add(username);
         mainTable.row();
 
         Label passLabel = new Label("Password", ls);
-        password = new TextField("", tfs);
+        password = new TextField(defaultConfiguration.getPassword(), tfs);
         mainTable.add(passLabel);
         mainTable.add(password);
         mainTable.row();
 
         Label addressLabel = new Label("Address", ls);
-        address = new TextField("", tfs);
+        address = new TextField(defaultConfiguration.getAddress(), tfs);
         mainTable.add(addressLabel);
         mainTable.add(address);
         mainTable.row();
 
         Label portLabel = new Label("Port", ls);
-        port = new TextField("", tfs);
+        port = new TextField(defaultConfiguration.getPort() == -1 ? "" : Integer.toString(defaultConfiguration.getPort()), tfs);
         mainTable.add(portLabel);
         mainTable.add(port);
         mainTable.row();

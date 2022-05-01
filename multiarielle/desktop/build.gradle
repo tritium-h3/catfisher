@@ -18,6 +18,10 @@ task run(dependsOn: classes, type: JavaExec) {
         // Required to run on macOS
         jvmArgs += "-XstartOnFirstThread"
     }
+    args += "-o"
+    args += "localhost"
+    args += "-p"
+    args += "12345"
 }
 
 task debug(dependsOn: classes, type: JavaExec) {

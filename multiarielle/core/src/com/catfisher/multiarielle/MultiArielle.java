@@ -28,6 +28,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 
@@ -37,10 +38,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Log4j2
+@RequiredArgsConstructor
 public class MultiArielle extends Game {
+	private final ConnectionConfiguration defaultConfiguration;
+
 	@Value
-	static
-	class ConnectionConfiguration {
+	public static class ConnectionConfiguration {
 		String username;
 		String password;
 		String address;
@@ -73,7 +76,7 @@ public class MultiArielle extends Game {
 	
 	@Override
 	public void create() {
-		MainMenuScreen screen = new MainMenuScreen(this, "");
+		MainMenuScreen screen = new MainMenuScreen(this, "", defaultConfiguration);
 		this.setScreen(screen);
 	}
 	
@@ -97,7 +100,7 @@ public class MultiArielle extends Game {
 			setupServerConn(server, config);
 		}
 		catch (ConnectException e) {
-			MainMenuScreen screen = new MainMenuScreen(this, "Connection refused.");
+			MainMenuScreen screen = new MainMenuScreen(this, "Connection refused.", config);
 			this.setScreen(screen);
 			return;
 		}
@@ -113,7 +116,7 @@ public class MultiArielle extends Game {
 
 		if (client.getDidServerReject().get()) {
 			log.info("Server rejected.");
-			MainMenuScreen screen = new MainMenuScreen(this, client.getError());
+			MainMenuScreen screen = new MainMenuScreen(this, client.getError(), config);
 			this.setScreen(screen);
 			return;
 		}
