@@ -7,6 +7,7 @@ import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
 import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.Character;
+import com.catfisher.multiarielle.model.Chunk;
 import com.catfisher.multiarielle.model.ServerModel;
 import com.catfisher.multiarielle.worldgen.WorldGenerator;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,7 +23,7 @@ import java.util.Map;
 public class ModelServer implements ClientEventVisitor<Boolean> {
     String password;
     @Getter
-    private final AbstractModel trueModel;
+    private final ServerModel trueModel;
     private final Map<String, ProxyClient> clients = new HashMap<>();
     private final Map<String, Character> clientCharacters = new HashMap<>();
 
@@ -88,12 +89,26 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         }
     }
 
-    Map<ProxyClient, SynchronizeEvent> generateSynchronizeEventForAllClients() {
+    private Chunk.Address getLocationOfClient(ProxyClient client) {
+        Character clientCharacter = clientCharacters.get(client.getClientId());
+        if (clientCharacter != null) {
+            for (AbstractModel.MutablePlacement placement : trueModel.getAllCharacters()) {
+                if (placement.getCharacter().getName().equals(clientCharacter.getName())) {
+                    return Chunk.Address.ofAbsoluteCoords(placement.getX(), placement.getY());
+                }
+            }
+        }
+        return Chunk.Address.ofAbsoluteCoords(0, 0);
+    }
+
+    private Map<ProxyClient, SynchronizeEvent> generateSynchronizeEventForAllClients() {
         Map<ProxyClient, SynchronizeEvent> toReturn = new HashMap<>();
         synchronized(trueModel) {
             Collection<AbstractModel.MutablePlacement> placements = trueModel.copyCharacters();
             for (ProxyClient client : clients.values()) {
-                SynchronizeEvent event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getMap(), placements);
+                SynchronizeEvent event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(),
+                        trueModel.getSubMapAround(getLocationOfClient(client)),
+                        placements);
                 toReturn.put(client, event);
             }
         }

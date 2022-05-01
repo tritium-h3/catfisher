@@ -6,7 +6,6 @@ import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
 import com.catfisher.multiarielle.clientServer.event.server.*;
 import com.catfisher.multiarielle.controller.delta.Delta;
-import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.ClientModel;
 import lombok.Getter;
 import lombok.Setter;
