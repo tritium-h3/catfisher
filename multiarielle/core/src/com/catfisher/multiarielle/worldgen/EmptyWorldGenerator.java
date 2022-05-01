@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmptyWorldGenerator implements WorldGenerator {
     @Override
-    public Chunk generateChunk(int chunkX, int chunkY) {
+    public Chunk generateChunk(Chunk.Address address) {
         Chunk.Builder builder = Chunk.builder();
 
         for (int i = 0; i < Chunk.SIZE_X; i++) {

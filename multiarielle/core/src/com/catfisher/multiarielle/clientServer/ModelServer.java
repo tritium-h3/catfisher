@@ -52,7 +52,7 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
             client.consume(new ServerConnectionAcknowledged());
             SynchronizeEvent event;
             synchronized (trueModel) {
-                event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getMap(), trueModel.copyCharacters());
+                event = generateSynchronizeEventForClient(client);
             }
             client.consume(event);
         }
@@ -101,15 +101,17 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         return Chunk.Address.ofAbsoluteCoords(0, 0);
     }
 
+    private SynchronizeEvent generateSynchronizeEventForClient(ProxyClient client) {
+        return new SynchronizeEvent(client.getSequenceNumberWatermark().get(),
+                trueModel.getSubMapAround(getLocationOfClient(client)),
+                trueModel.copyCharacters());
+    }
+
     private Map<ProxyClient, SynchronizeEvent> generateSynchronizeEventForAllClients() {
         Map<ProxyClient, SynchronizeEvent> toReturn = new HashMap<>();
         synchronized(trueModel) {
-            Collection<AbstractModel.MutablePlacement> placements = trueModel.copyCharacters();
             for (ProxyClient client : clients.values()) {
-                SynchronizeEvent event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(),
-                        trueModel.getSubMapAround(getLocationOfClient(client)),
-                        placements);
-                toReturn.put(client, event);
+                toReturn.put(client, generateSynchronizeEventForClient(client));
             }
         }
         return toReturn;

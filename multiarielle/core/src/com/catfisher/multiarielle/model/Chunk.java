@@ -73,6 +73,14 @@ public class Chunk {
             return new Address(Math.floorDiv(absX, SIZE_X), Math.floorDiv(absY, SIZE_Y));
         }
 
+        public int getMinAbsX() {
+            return x * SIZE_X;
+        }
+
+        public int getMinAbsY() {
+            return y * SIZE_Y;
+        }
+
         public static Pair<Integer, Integer> getOffset(int absX, int absY) {
             return new ImmutablePair<>(Math.floorMod(absX, SIZE_X), Math.floorMod(absY, SIZE_Y));
         }

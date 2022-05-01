@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerModel extends AbstractModel {
-    private static final int SUBSCRIPTION_RADIUS = 3;
+    private static final int SUBSCRIPTION_RADIUS = 2;
 
     private final WorldGenerator generator;
     private final Map<Chunk.Address, Chunk> map;
@@ -16,7 +16,7 @@ public class ServerModel extends AbstractModel {
         this.generator = generator;
         map = LazyMap.lazyMap(
                 new HashMap<>(),
-                key -> generator.generateChunk(key.getX(), key.getY())
+                key -> generator.generateChunk(key)
         );
     }
 

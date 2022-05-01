@@ -20,7 +20,7 @@ public class FileWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public Chunk generateChunk(int chunkX, int chunkY) {
-        return chunkMap.get(new Chunk.Address(chunkX, chunkY));
+    public Chunk generateChunk(Chunk.Address address) {
+        return chunkMap.get(address);
     }
 }
