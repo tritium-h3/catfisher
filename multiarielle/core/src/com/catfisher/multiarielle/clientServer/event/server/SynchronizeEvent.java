@@ -1,6 +1,6 @@
 package com.catfisher.multiarielle.clientServer.event.server;
 
-import com.catfisher.multiarielle.model.AbsoluteModel;
+import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.Chunk;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @Value
@@ -23,7 +22,7 @@ public class SynchronizeEvent extends ServerEvent {
     @JsonDeserialize(keyUsing = Chunk.Address.KeyDeser.class)
     Map<Chunk.Address, Chunk> map;
 
-    Collection<AbsoluteModel.MutablePlacement> allCharacters;
+    Collection<AbstractModel.MutablePlacement> allCharacters;
 
     @Override
     public <Response> Response receive(ServerEventVisitor<Response> v) {

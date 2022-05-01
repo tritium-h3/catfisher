@@ -2,6 +2,7 @@ package com.catfisher.multiarielle;
 
 import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.controller.ServerController;
+import com.catfisher.multiarielle.worldgen.FileWorldGenerator;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
@@ -15,9 +16,7 @@ public class Server {
         Scanner scanner = new Scanner(System.in);
         String pass = scanner.nextLine();
         log.info(pass);
-        ModelServer server = new ModelServer(pass);
-        server.getTrueModel().loadBackground("bg.csv",0, 0);
-        server.getTrueModel().loadBackground("bg.csv",0, -1);
+        ModelServer server = new ModelServer(pass, new FileWorldGenerator("bg.csv"));
         System.out.print("port> ");
         int port = Integer.parseInt(scanner.nextLine());
         if (arg.length > 0) {

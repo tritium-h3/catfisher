@@ -5,14 +5,15 @@ import com.catfisher.multiarielle.clientServer.event.server.*;
 import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
 import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
 import com.catfisher.multiarielle.controller.delta.Delta;
-import com.catfisher.multiarielle.model.AbsoluteModel;
+import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.Character;
+import com.catfisher.multiarielle.model.ServerModel;
+import com.catfisher.multiarielle.worldgen.WorldGenerator;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class ModelServer implements ClientEventVisitor<Boolean> {
     String password;
     @Getter
-    private final AbsoluteModel trueModel;
+    private final AbstractModel trueModel;
     private final Map<String, ProxyClient> clients = new HashMap<>();
     private final Map<String, Character> clientCharacters = new HashMap<>();
 
@@ -38,9 +39,9 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         }
     }
 
-    public ModelServer(String password) {
+    public ModelServer(String password, WorldGenerator generator) {
         this.password = password;
-        trueModel = new AbsoluteModel();
+        trueModel = new ServerModel(generator);
     }
 
     public void addClient(ProxyClient client) {
@@ -90,7 +91,7 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
     Map<ProxyClient, SynchronizeEvent> generateSynchronizeEventForAllClients() {
         Map<ProxyClient, SynchronizeEvent> toReturn = new HashMap<>();
         synchronized(trueModel) {
-            Collection<AbsoluteModel.MutablePlacement> placements = trueModel.copyCharacters();
+            Collection<AbstractModel.MutablePlacement> placements = trueModel.copyCharacters();
             for (ProxyClient client : clients.values()) {
                 SynchronizeEvent event = new SynchronizeEvent(client.getSequenceNumberWatermark().get(), trueModel.getMap(), placements);
                 toReturn.put(client, event);

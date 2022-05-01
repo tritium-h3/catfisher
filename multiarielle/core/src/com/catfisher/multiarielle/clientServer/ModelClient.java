@@ -6,25 +6,22 @@ import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
 import com.catfisher.multiarielle.clientServer.event.server.*;
 import com.catfisher.multiarielle.controller.delta.Delta;
-import com.catfisher.multiarielle.model.AbsoluteModel;
+import com.catfisher.multiarielle.model.AbstractModel;
+import com.catfisher.multiarielle.model.ClientModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Condition;
 
 @Log4j2
 public class ModelClient implements ServerEventVisitor<Boolean> {
-    private final AbsoluteModel localCopy;
+    private final ClientModel localCopy;
     private ProxyServer server;
     @Getter
     private final String clientId;
@@ -42,7 +39,7 @@ public class ModelClient implements ServerEventVisitor<Boolean> {
 
     private final AtomicLong sequenceNumber = new AtomicLong(0);
 
-    public ModelClient(String clientId, AbsoluteModel localCopy) {
+    public ModelClient(String clientId, ClientModel localCopy) {
         this.localCopy = localCopy;
         this.clientId = clientId;
     }

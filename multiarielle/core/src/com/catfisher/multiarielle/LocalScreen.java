@@ -1,22 +1,16 @@
 package com.catfisher.multiarielle;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.catfisher.multiarielle.model.AbsoluteModel;
+import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.LocalModel;
-import com.catfisher.multiarielle.model.Model;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.sprite.SpriteAtlas;
 import lombok.Getter;
@@ -140,9 +134,9 @@ public class LocalScreen implements Screen {
 
         ScreenUtils.clear(Color.BLACK);
 
-        AbsoluteModel.MutablePlacement mp = null;
+        AbstractModel.MutablePlacement mp = null;
 
-        for (AbsoluteModel.MutablePlacement i :  localModel.getLocalModel().getAllCharacters()) {
+        for (AbstractModel.MutablePlacement i :  localModel.getLocalModel().getAllCharacters()) {
             if (i.getCharacter().equals(game.getHero())) {
                 mp = i;
             }

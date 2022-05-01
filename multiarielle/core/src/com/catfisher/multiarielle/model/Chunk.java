@@ -62,15 +62,6 @@ public class Chunk {
         return new Chunk(background);
     }
 
-    public static Chunk readFromFile(String filename) {
-        try {
-            return readFromCSV(new String(Files.readAllBytes(Paths.get(filename)), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            log.error("IOException: ", e);
-            return null;
-        }
-    }
-
     @Data
     @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
     @AllArgsConstructor
@@ -101,5 +92,22 @@ public class Chunk {
                 return new Address(Integer.parseInt(fields[0]), Integer.parseInt(fields[1]));
             }
         }
+    }
+
+    public static class Builder {
+        BackgroundTile[][] accumulator = new BackgroundTile[SIZE_X][SIZE_Y];
+
+        public Builder insertTile(int x, int y, BackgroundTile tile) {
+            accumulator[x][y] = tile;
+            return this;
+        }
+
+        public Chunk build() {
+            return new Chunk(accumulator);
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 }

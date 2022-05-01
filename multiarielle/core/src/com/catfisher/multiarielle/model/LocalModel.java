@@ -12,7 +12,7 @@ import java.util.List;
 @Log4j2
 public class LocalModel implements Model, DeltaConsumer<Boolean> {
     @Getter
-    private final AbsoluteModel localModel = new AbsoluteModel();
+    private final ClientModel localModel = new ClientModel();
     private ModelClient modelClient;
 
     public void associateClient(ModelClient client) {

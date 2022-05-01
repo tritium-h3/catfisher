@@ -1,36 +1,26 @@
 package com.catfisher.multiarielle.model;
 
-import com.badlogic.gdx.math.Vector2;
 import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.delta.*;
 import com.catfisher.multiarielle.sprite.Sprite;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.catfisher.multiarielle.worldgen.WorldGenerator;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.collections4.map.LazyMap;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Log4j2
-public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsumer<Boolean> {
+@NoArgsConstructor
+public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, DeltaConsumer<Boolean> {
+
+    public abstract Map<Chunk.Address, Chunk> getMap();
 
     @Getter
-    private Collection<MutablePlacement> allCharacters = new HashSet<>();
-
-    @Getter
-    private Map<Chunk.Address, Chunk> map = new HashMap<>();
-
-    public void loadBackground(String filename, int x, int y) throws IOException, IndexOutOfBoundsException {
-        map.put(Chunk.Address.ofAbsoluteCoords(x, y), Chunk.readFromFile(filename));
-    }
+    protected Collection<MutablePlacement> allCharacters = new HashSet<>();
 
     @Data
     @AllArgsConstructor
@@ -58,13 +48,13 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                 for (int y = startY; y < endY; y++) {
                     Chunk.Address chunkAddress = Chunk.Address.ofAbsoluteCoords(x, y);
                     Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(x, y);
-                    Chunk chunk = map.get(chunkAddress);
+                    Chunk chunk = getMap().get(chunkAddress);
                     if  (chunk == null) {
                         toReturn[x-startX][y-startY] = new ArrayList<>();
                         toReturn[x-startX][y-startY].add(Sprite.EMPTY);
                     } else {
                         toReturn[x-startX][y-startY] = new ArrayList<>();
-                        toReturn[x - startX][y - startY].add(map.get(chunkAddress).
+                        toReturn[x - startX][y - startY].add(getMap().get(chunkAddress).
                                 getBgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].getAppearance());
                     }
                 }
@@ -90,11 +80,11 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
                     int newY = p.getY() + e.getDeltaY();
 
                     Chunk.Address newAddress = Chunk.Address.ofAbsoluteCoords(newX, newY);
-                    if (map.get(newAddress) == null) {
+                    if (getMap().get(newAddress) == null) {
                         return false;
                     }
 
-                    BackgroundTile[][] bgLayer = map.get(newAddress).getBgLayer();
+                    BackgroundTile[][] bgLayer = getMap().get(newAddress).getBgLayer();
 
                     // TODO: Bug involving out of bounds
                     Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(newX, newY);
@@ -115,12 +105,6 @@ public class AbsoluteModel implements Model, DeltaVisitor<Boolean>, DeltaConsume
     @Override
     public Boolean visit(CharacterAddDelta e) {
         allCharacters.add(new MutablePlacement(e.getCharacter(), e.getX(), e.getY()));
-        return true;
-    }
-
-    public Boolean synchronize(SynchronizeEvent e) {
-        map = e.getMap();
-        allCharacters = e.getAllCharacters();
         return true;
     }
 

@@ -6,6 +6,7 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://repo.spongepowered.org/repository/maven-public/" }
         google()
     }
     dependencies {
@@ -95,5 +96,6 @@ project(":core") {
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.1'
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
         implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2'
+        implementation "org.spongepowered:noise:2.0.0-SNAPSHOT"
     }
 }
