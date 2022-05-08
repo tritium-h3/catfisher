@@ -3,6 +3,7 @@ package com.catfisher.multiarielle.clientServer;
 
 import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
 import com.catfisher.multiarielle.clientServer.event.server.ServerEvent;
+import com.catfisher.multiarielle.util.LineAccumulator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,10 +18,11 @@ import java.nio.charset.StandardCharsets;
 
 @Log4j2
 public class ProxyServer extends SimpleChannelInboundHandler<String> {
-
     ModelClient client;
     ChannelHandlerContext conn;
     ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+
+    LineAccumulator accumulator = new LineAccumulator();
 
     public void setupClient(ModelClient client) {
         this.client = client;
@@ -31,7 +33,7 @@ public class ProxyServer extends SimpleChannelInboundHandler<String> {
             try {
                 String serialized = objectMapper.writeValueAsString(e);
                 log.debug("Serialized into {}", serialized);
-                conn.writeAndFlush(serialized).sync();
+                conn.writeAndFlush(serialized + "\0").sync();
             } catch (JsonProcessingException ex) {
                 log.error("Json processing exception", ex);
             } catch (InterruptedException ex) {
@@ -49,10 +51,12 @@ public class ProxyServer extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
         try {
-            ServerEvent event = objectMapper.readValue(msg, ServerEvent.class);
-            log.info("Event received: {}", event);
-
-            client.consume(event);
+            accumulator.addChunk(msg);
+            for (String line : accumulator.getCompletedLines()) {
+                ServerEvent event = objectMapper.readValue(line, ServerEvent.class);
+                log.info("Event received: {}", event);
+                client.consume(event);
+            }
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {

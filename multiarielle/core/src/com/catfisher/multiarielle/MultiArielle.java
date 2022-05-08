@@ -146,7 +146,6 @@ public class MultiArielle extends Game {
 			b.handler(new ChannelInitializer<SocketChannel>() {
 				@Override
 				public void initChannel(SocketChannel ch) throws Exception {
-					ch.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
 					ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
 					ch.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
 					ch.pipeline().addLast(server);

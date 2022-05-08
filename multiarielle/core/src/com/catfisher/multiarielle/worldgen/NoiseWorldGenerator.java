@@ -33,7 +33,6 @@ public class NoiseWorldGenerator implements WorldGenerator {
                 double x = address.getMinAbsX() + i;
                 double y = address.getMinAbsY() + j;
                 double hmap = noise.get(x, y, 500.0);
-                log.info("({}, {}) : {}", x, y, hmap);
                 builder.insertTile(i, j, hmap < SEA_LEVEL ? BackgroundTile.WATER : BackgroundTile.GRASS);
             }
         }

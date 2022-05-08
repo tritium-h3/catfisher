@@ -4,6 +4,7 @@ import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.clientServer.event.client.ClientEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
 import com.catfisher.multiarielle.clientServer.event.server.ServerConnectionRejected;
+import com.catfisher.multiarielle.util.LineAccumulator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.ServerBootstrap;
@@ -27,6 +28,8 @@ import java.nio.charset.StandardCharsets;
 public class ServerController extends SimpleChannelInboundHandler<String> {
     private final ModelServer server;
     private final int port;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final LineAccumulator lineAccumulator = new LineAccumulator();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -44,22 +47,21 @@ public class ServerController extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        log.info("Message received");
-
         try {
-            ClientEvent e = objectMapper.readValue(msg, ClientEvent.class);
-            ConnectEvent newConnect;
-            log.info("Received event {}", e);
-            if (e instanceof ConnectEvent) {
-                newConnect = new ConnectEvent(e.getClientId(), ((ConnectEvent) e).getPassword(), ctx);
-                if (!consume(newConnect)) {
-                    String toSend = objectMapper.writeValueAsString(new ServerConnectionRejected("Username already logged in."));
-                    ctx.writeAndFlush(toSend + "\n");
+            lineAccumulator.addChunk(msg);
+            for (String line : lineAccumulator.getCompletedLines()) {
+                ClientEvent e = objectMapper.readValue(line, ClientEvent.class);
+                ConnectEvent newConnect;
+                log.info("Received event {}", e);
+                if (e instanceof ConnectEvent) {
+                    newConnect = new ConnectEvent(e.getClientId(), ((ConnectEvent) e).getPassword(), ctx);
+                    if (!consume(newConnect)) {
+                        String toSend = objectMapper.writeValueAsString(new ServerConnectionRejected("Username already logged in."));
+                        ctx.writeAndFlush(toSend + "\0");
+                    }
+                } else {
+                    consume(e);
                 }
-            } else {
-                consume(e);
             }
         } catch (JsonProcessingException ex) {
             ex.printStackTrace();

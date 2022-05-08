@@ -14,8 +14,10 @@ public class ClientModel extends AbstractModel {
     }
 
     public Boolean synchronize(SynchronizeEvent e) {
-        map = e.getMap();
-        allCharacters = e.getAllCharacters();
-        return true;
+        synchronized (this) {
+            map = e.getMap();
+            allCharacters = e.getAllCharacters();
+            return true;
+        }
     }
 }
