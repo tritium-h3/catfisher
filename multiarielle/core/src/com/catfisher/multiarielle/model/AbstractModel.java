@@ -3,6 +3,8 @@ package com.catfisher.multiarielle.model;
 import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.delta.*;
+import com.catfisher.multiarielle.entity.DrawableEntity;
+import com.catfisher.multiarielle.entity.Entity;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.worldgen.WorldGenerator;
 import lombok.*;
@@ -59,6 +61,20 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
                     }
                 }
             }
+
+            // TODO: Oneliner horrible, clean!
+            for (Entity entity : getMap().values().stream().map(Chunk -> Chunk.getEntities()).flatMap(Collection::stream).collect(Collectors.toList())) {
+                if (entity instanceof DrawableEntity) {
+                    DrawableEntity drawableEntity = (DrawableEntity) entity;
+                    if ((drawableEntity.getX() >= startX) &&
+                            (drawableEntity.getX() < endX) &&
+                            (drawableEntity.getY() >= startY) &&
+                            (drawableEntity.getY() < endY)) {
+                        toReturn[drawableEntity.getX() - startX][drawableEntity.getY() - startY].add(drawableEntity.getAppearance());
+                    }
+                }
+            }
+
             for (MutablePlacement mp : allCharacters) {
                 if ((mp.getX() >= startX) &&
                         (mp.getX() < endX) &&
