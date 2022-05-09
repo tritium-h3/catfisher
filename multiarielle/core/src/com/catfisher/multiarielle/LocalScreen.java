@@ -130,6 +130,7 @@ public class LocalScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        game.getLocalModel().update();
         stage.draw();
 
         ScreenUtils.clear(Color.BLACK);

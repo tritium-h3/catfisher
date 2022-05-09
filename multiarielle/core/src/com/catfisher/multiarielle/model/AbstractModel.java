@@ -118,4 +118,9 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
     public Boolean consume(Delta e) {
         return e.accept(this);
     }
+
+    @Override
+    public void update() {
+        getMap().values().stream().forEach(chunk -> chunk.update(this));
+    }
 }

@@ -26,6 +26,11 @@ public class LocalModel implements Model, DeltaConsumer<Boolean> {
     }
 
     @Override
+    public void update() {
+        localModel.update();
+    }
+
+    @Override
     public List<Sprite>[][] getSpritePlacements(int startX, int startY, int endX, int endY) {
         return localModel.getSpritePlacements(startX, startY, endX, endY);
     }

@@ -39,6 +39,19 @@ public class Server {
             }
         }).start();
 
+        new Thread(() -> {
+            long time;
+            while (true) {
+                time = System.currentTimeMillis();
+                server.getTrueModel().update();
+                try {
+                    Thread.sleep(1000 / 60 - (System.currentTimeMillis() - time));
+                } catch (InterruptedException e) {
+                    log.error("Interrupted while sleeping ", e);
+                }
+            }
+        }).start();
+
         serverController.run();
     }
 

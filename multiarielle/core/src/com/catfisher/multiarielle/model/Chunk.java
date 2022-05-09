@@ -1,6 +1,7 @@
 package com.catfisher.multiarielle.model;
 
 import com.badlogic.gdx.math.Vector2;
+import com.catfisher.multiarielle.entity.Entity;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
@@ -16,10 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 @Log4j2
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
@@ -30,6 +28,8 @@ public class Chunk {
 
     @Getter
     private BackgroundTile[][] bgLayer;
+    @Getter
+    private Collection<Entity> entities;
 
     public static Chunk readFromCSV(String csv) {
         List<BackgroundTile[]> lines = new ArrayList<>();
@@ -59,7 +59,11 @@ public class Chunk {
             }
         }
 
-        return new Chunk(background);
+        return new Chunk(background, new ArrayList<Entity>());
+    }
+
+    public void update(AbstractModel abstractModel) {
+        entities.stream().forEach(entity -> entity.update(abstractModel));
     }
 
     @Data
@@ -111,7 +115,7 @@ public class Chunk {
         }
 
         public Chunk build() {
-            return new Chunk(accumulator);
+            return new Chunk(accumulator, new HashSet<>());
         }
     }
 
