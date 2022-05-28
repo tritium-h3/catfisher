@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.catfisher.multiarielle.entity.Entity;
 import com.catfisher.multiarielle.entity.StaticSprite;
 import com.catfisher.multiarielle.sprite.Sprite;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
@@ -31,7 +32,7 @@ public class Chunk {
     @Getter
     private BackgroundTile[][] bgLayer;
     @Getter
-    private Collection<Entity> entities;
+    private Map<String, Entity> entities;
 
     public static Chunk readFromCSV(String csv) {
         List<BackgroundTile[]> lines = new ArrayList<>();
@@ -61,11 +62,7 @@ public class Chunk {
             }
         }
 
-        return new Chunk(background, new ArrayList<Entity>());
-    }
-
-    public void update(AbstractModel abstractModel) {
-        entities.stream().forEach(entity -> entity.update(abstractModel));
+        return new Chunk(background, new HashMap<>());
     }
 
     @Data
@@ -79,10 +76,12 @@ public class Chunk {
             return new Address(Math.floorDiv(absX, SIZE_X), Math.floorDiv(absY, SIZE_Y));
         }
 
+        @JsonIgnore
         public int getMinAbsX() {
             return x * SIZE_X;
         }
 
+        @JsonIgnore
         public int getMinAbsY() {
             return y * SIZE_Y;
         }
@@ -117,10 +116,7 @@ public class Chunk {
         }
 
         public Chunk build() {
-            // DEBUG: Entity test
-            // Remove when satisfied with entities
-            Collection<Entity> entities = new HashSet<>();
-            entities.add(new StaticSprite(5, 5, Sprite.HERO));
+            Map<String, Entity> entities = new HashMap<>();
             return new Chunk(accumulator, entities);
         }
     }

@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CharacterAddDelta.class, name = "CharacterAddDelta"),
         @JsonSubTypes.Type(value = CharacterRemoveDelta.class, name = "CharacterRemoveDelta"),
-        @JsonSubTypes.Type(value = MoveDelta.class, name = "MoveDelta"),
+        @JsonSubTypes.Type(value = CharacterMoveDelta.class, name = "CharacterMoveDelta"),
+        @JsonSubTypes.Type(value = EntityChangeDelta.class, name = "EntityChangeDelta"),
         @JsonSubTypes.Type(value = SynchronizeEvent.class, name = "SynchronizeDelta")
 })
 public abstract class Delta {

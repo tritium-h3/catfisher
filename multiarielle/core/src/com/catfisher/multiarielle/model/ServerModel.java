@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerModel extends AbstractModel {
-    private static final int SUBSCRIPTION_RADIUS = 2;
+    private static final int SUBSCRIPTION_RADIUS = 4;
 
     private final WorldGenerator generator;
     private final Map<Chunk.Address, Chunk> map;

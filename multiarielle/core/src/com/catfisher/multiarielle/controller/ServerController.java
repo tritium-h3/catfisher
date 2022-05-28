@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 @Log4j2
-public class ServerController extends SimpleChannelInboundHandler<String> {
+public class ServerController extends SimpleChannelInboundHandler<String> implements Runnable {
     private final ModelServer server;
     private final int port;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -75,33 +75,38 @@ public class ServerController extends SimpleChannelInboundHandler<String> {
         ctx.close();
     }
 
-    public void run() throws Exception {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+    @Override
+    public void run() {
         try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
-                            ch.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
-                            ch.pipeline().addLast(new ServerController(server, port));
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+            EventLoopGroup bossGroup = new NioEventLoopGroup();
+            EventLoopGroup workerGroup = new NioEventLoopGroup();
+            try {
+                ServerBootstrap b = new ServerBootstrap();
+                b.group(bossGroup, workerGroup)
+                        .channel(NioServerSocketChannel.class)
+                        .handler(new LoggingHandler(LogLevel.INFO))
+                        .childHandler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            public void initChannel(SocketChannel ch) throws Exception {
+                                ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
+                                ch.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
+                                ch.pipeline().addLast(new ServerController(server, port));
+                            }
+                        })
+                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            // Bind and start to accept incoming connections.
-            ChannelFuture f = b.bind(port).sync();
+                // Bind and start to accept incoming connections.
+                ChannelFuture f = b.bind(port).sync();
 
-            // Wait until the server socket is closed.
-            f.channel().closeFuture().sync();
-        } finally {
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
+                // Wait until the server socket is closed.
+                f.channel().closeFuture().sync();
+            } finally {
+                workerGroup.shutdownGracefully();
+                bossGroup.shutdownGracefully();
+            }
+        } catch (InterruptedException exn) {
+            log.warn("Interrupted", exn);
         }
     }
 

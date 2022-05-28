@@ -3,6 +3,8 @@ package com.catfisher.multiarielle.entity;
 import com.catfisher.multiarielle.clientServer.event.client.ClientChatEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ClientDeltaEvent;
 import com.catfisher.multiarielle.clientServer.event.client.ConnectEvent;
+import com.catfisher.multiarielle.controller.delta.Delta;
+import com.catfisher.multiarielle.controller.delta.EntityChangeDelta;
 import com.catfisher.multiarielle.model.AbstractModel;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -13,7 +15,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = StaticSprite.class, name = "StaticSprite"),
+        @JsonSubTypes.Type(value = RandomWalkEntity.class, name = "RandomWalkEntity")
 })
 public interface Entity {
-    void update(AbstractModel abstractModel);
+    String getId();
+    EntityChangeDelta update(AbstractModel abstractModel);
 }

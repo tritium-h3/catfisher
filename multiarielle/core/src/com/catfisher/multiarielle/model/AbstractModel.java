@@ -1,15 +1,12 @@
 package com.catfisher.multiarielle.model;
 
-import com.catfisher.multiarielle.clientServer.event.server.SynchronizeEvent;
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.delta.*;
 import com.catfisher.multiarielle.entity.DrawableEntity;
 import com.catfisher.multiarielle.entity.Entity;
 import com.catfisher.multiarielle.sprite.Sprite;
-import com.catfisher.multiarielle.worldgen.WorldGenerator;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.map.LazyMap;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -63,7 +60,7 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
             }
 
             // TODO: Oneliner horrible, clean!
-            for (Entity entity : getMap().values().stream().map(Chunk -> Chunk.getEntities()).flatMap(Collection::stream).collect(Collectors.toList())) {
+            for (Entity entity : getMap().values().stream().map(Chunk -> Chunk.getEntities().values()).flatMap(Collection::stream).collect(Collectors.toList())) {
                 if (entity instanceof DrawableEntity) {
                     DrawableEntity drawableEntity = (DrawableEntity) entity;
                     if ((drawableEntity.getX() >= startX) &&
@@ -88,7 +85,7 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
     }
 
     @Override
-    public Boolean visit(MoveDelta e) {
+    public Boolean visit(CharacterMoveDelta e) {
         synchronized (this) {
             for (MutablePlacement p : allCharacters) {
                 if (p.getCharacter().getName().equals(e.getCharacter().getName())) {
@@ -131,12 +128,22 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
     }
 
     @Override
-    public Boolean consume(Delta e) {
-        return e.accept(this);
+    public Boolean visit(EntityChangeDelta entityChangeDelta) {
+        Chunk oldChunk = getMap().get(entityChangeDelta.getOldChunk());
+        if (oldChunk == null) {
+            return true;
+        }
+        oldChunk.getEntities().remove(entityChangeDelta.getOldEntity());
+        Chunk newChunk = getMap().get(entityChangeDelta.getNewChunk());
+        if (newChunk == null) {
+            return true;
+        }
+        newChunk.getEntities().put(entityChangeDelta.getOldEntity(), entityChangeDelta.getNewEntity());
+        return true;
     }
 
     @Override
-    public void update() {
-        getMap().values().stream().forEach(chunk -> chunk.update(this));
+    public Boolean consume(Delta e) {
+        return e.accept(this);
     }
 }

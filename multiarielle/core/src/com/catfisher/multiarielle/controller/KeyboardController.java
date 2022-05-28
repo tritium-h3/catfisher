@@ -4,7 +4,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.catfisher.multiarielle.ChatHandler;
 import com.catfisher.multiarielle.controller.delta.Delta;
-import com.catfisher.multiarielle.controller.delta.MoveDelta;
+import com.catfisher.multiarielle.controller.delta.CharacterMoveDelta;
 import com.catfisher.multiarielle.model.Character;
 
 import java.util.HashMap;
@@ -20,10 +20,10 @@ public class KeyboardController implements InputProcessor {
         this.hero = hero;
         this.consumer = consumer;
         this.chatHandler = chatHandler;
-        keyMap.put(Input.Keys.UP, new MoveDelta(hero, 0, 1));
-        keyMap.put(Input.Keys.DOWN, new MoveDelta(hero, 0, -1));
-        keyMap.put(Input.Keys.RIGHT, new MoveDelta(hero, 1, 0));
-        keyMap.put(Input.Keys.LEFT, new MoveDelta(hero, -1, 0));
+        keyMap.put(Input.Keys.UP, new CharacterMoveDelta(hero, 0, 1));
+        keyMap.put(Input.Keys.DOWN, new CharacterMoveDelta(hero, 0, -1));
+        keyMap.put(Input.Keys.RIGHT, new CharacterMoveDelta(hero, 1, 0));
+        keyMap.put(Input.Keys.LEFT, new CharacterMoveDelta(hero, -1, 0));
     }
 
     @Override

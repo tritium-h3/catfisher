@@ -21,6 +21,8 @@ import java.util.Map;
 
 @Log4j2
 public class ModelServer implements ClientEventVisitor<Boolean> {
+    public static final String SERVER_ID = "SERVER";
+
     String password;
     @Getter
     private final ServerModel trueModel;
@@ -74,6 +76,10 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
 
         addClient(client);
         return true;
+    }
+
+    public boolean applyDelta(Delta delta) {
+        return applyDelta(SERVER_ID, delta);
     }
 
     private boolean applyDelta(String senderId, Delta delta) {

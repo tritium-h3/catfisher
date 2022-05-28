@@ -1,5 +1,7 @@
 package com.catfisher.multiarielle.entity;
 
+import com.catfisher.multiarielle.controller.delta.Delta;
+import com.catfisher.multiarielle.controller.delta.EntityChangeDelta;
 import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -10,12 +12,17 @@ import lombok.NoArgsConstructor;
 
 public class StaticSprite extends SpriteEntity {
     @JsonCreator
-    public StaticSprite(@JsonProperty("x") int x, @JsonProperty("y") int y, @JsonProperty("appearance") Sprite appearance) {
-        super(x, y, appearance);
+    public StaticSprite(
+            @JsonProperty("x") int x,
+            @JsonProperty("y") int y,
+            @JsonProperty("appearance") Sprite appearance,
+            @JsonProperty("id") String id
+            ) {
+        super(x, y, appearance, id);
     }
 
     @Override
-    public void update(AbstractModel abstractModel) {
-
+    public EntityChangeDelta update(AbstractModel abstractModel) {
+        return null;
     }
 }

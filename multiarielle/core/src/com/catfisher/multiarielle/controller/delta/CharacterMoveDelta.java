@@ -10,7 +10,7 @@ import lombok.Value;
 @Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class MoveDelta extends Delta {
+public class CharacterMoveDelta extends Delta {
     Character character;
     int deltaX, deltaY;
 
@@ -21,6 +21,6 @@ public class MoveDelta extends Delta {
 
     @Override
     public Delta invert() {
-        return new MoveDelta(character, -deltaX, -deltaY);
+        return new CharacterMoveDelta(character, -deltaX, -deltaY);
     }
 }
