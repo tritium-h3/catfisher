@@ -25,4 +25,9 @@ public class StaticSprite extends SpriteEntity {
     public EntityChangeDelta update(AbstractModel abstractModel) {
         return null;
     }
+
+    @Override
+    public void acceptUpdate(String update, AbstractModel abstractModel) {
+
+    }
 }

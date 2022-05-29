@@ -60,7 +60,7 @@ public class AiController implements Runnable {
                 EntityChangeDelta delta = (entityToCall.update(model.getTrueModel()));
                 model.applyDelta(delta);
                 synchronized (wakeupQueue) {
-                    wakeupQueue.add(new QueuedCall(delta.getNewEntity(), pretendCurrentTime + period, period));
+                    wakeupQueue.add(new QueuedCall(entityToCall, pretendCurrentTime + period, period));
                 }
             }
         } catch (InterruptedException exn) {

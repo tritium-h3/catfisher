@@ -7,11 +7,16 @@ import com.catfisher.multiarielle.model.Chunk;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.*;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Random;
 
-public class RandomWalkEntity extends SpriteEntity {
-    static Random seededRandom = new Random();
+@Log4j2
+public class RandomWalkEntity extends MovingEntity {
+    private static Random seededRandom = new Random();
 
     @JsonCreator
     public RandomWalkEntity(
@@ -28,11 +33,19 @@ public class RandomWalkEntity extends SpriteEntity {
 
     @Override
     public EntityChangeDelta update(AbstractModel abstractModel) {
-        int xDiff = seededRandom.nextInt(3) - 1;
-        int newX = getX() + xDiff;
-        int yDiff = seededRandom.nextInt(3) - 1;
-        int newY = getY() + yDiff;
-        return new EntityChangeDelta(Chunk.Address.ofAbsoluteCoords(getX(), getY()), getId(),
-                Chunk.Address.ofAbsoluteCoords(newX, newY), new RandomWalkEntity(newX, newY, getAppearance(), getId()));
+        try {
+            int xDiff = seededRandom.nextInt(3) - 1;
+            int newX = x + xDiff;
+            int yDiff = seededRandom.nextInt(3) - 1;
+            int newY = y + yDiff;
+            return new EntityChangeDelta(
+                    getId(),
+                    Chunk.Address.ofAbsoluteCoords(x, y),
+                    objectMapper.writeValueAsString(new WalkDelta(newX, newY))
+            );
+        } catch (JsonProcessingException exn) {
+            log.error(exn);
+            throw new RuntimeException(exn);
+        }
     }
 }

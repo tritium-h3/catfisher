@@ -99,7 +99,6 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
 
                     BackgroundTile[][] bgLayer = getMap().get(newAddress).getBgLayer();
 
-                    // TODO: Bug involving out of bounds
                     Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(newX, newY);
                     if ((bgLayer[chunkOffset.getLeft()][chunkOffset.getRight()] == null) ||
                             (bgLayer[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible())) {
@@ -133,13 +132,27 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
         if (oldChunk == null) {
             return true;
         }
-        oldChunk.getEntities().remove(entityChangeDelta.getOldEntity());
-        Chunk newChunk = getMap().get(entityChangeDelta.getNewChunk());
-        if (newChunk == null) {
-            return true;
-        }
-        newChunk.getEntities().put(entityChangeDelta.getOldEntity(), entityChangeDelta.getNewEntity());
+        oldChunk.getEntities().get(entityChangeDelta.getEntityId()).acceptUpdate(entityChangeDelta.getChange(), this);
         return true;
+    }
+
+    public void moveEntityToChunk(Entity entity, Chunk.Address oldChunk, Chunk.Address newChunk) {
+        Chunk fromChunk = getMap().get(oldChunk);
+        if (fromChunk != null) {
+            fromChunk.getEntities().remove(entity.getId());
+        }
+        Chunk toChunk = getMap().get(newChunk);
+        if (toChunk != null) {
+            toChunk.getEntities().put(entity.getId(), entity);
+        }
+    }
+
+    public boolean isImpassable(int x, int y) {
+        Chunk.Address addr = Chunk.Address.ofAbsoluteCoords(x, y);
+        Chunk chunk = getMap().get(addr);
+        if (chunk == null) return true;
+        Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(x, y);
+        return chunk.getBgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible();
     }
 
     @Override

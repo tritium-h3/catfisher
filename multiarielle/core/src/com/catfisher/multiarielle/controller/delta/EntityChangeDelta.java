@@ -13,10 +13,9 @@ import lombok.Value;
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class EntityChangeDelta extends Delta {
+    String entityId;
     Chunk.Address oldChunk;
-    String oldEntity;
-    Chunk.Address newChunk;
-    Entity newEntity;
+    String change;
 
     @Override
     public <Response> Response accept(DeltaVisitor<Response> v) {

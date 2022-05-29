@@ -15,9 +15,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = StaticSprite.class, name = "StaticSprite"),
-        @JsonSubTypes.Type(value = RandomWalkEntity.class, name = "RandomWalkEntity")
+        @JsonSubTypes.Type(value = RandomWalkEntity.class, name = "RandomWalkEntity"),
+        @JsonSubTypes.Type(value = SearchingEntity.class, name = "SearchingEntity")
 })
 public interface Entity {
     String getId();
     EntityChangeDelta update(AbstractModel abstractModel);
+    void acceptUpdate(String update, AbstractModel abstractModel);
 }

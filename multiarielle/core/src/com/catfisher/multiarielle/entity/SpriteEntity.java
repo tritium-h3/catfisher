@@ -1,10 +1,7 @@
 package com.catfisher.multiarielle.entity;
 
 import com.catfisher.multiarielle.sprite.Sprite;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -12,7 +9,7 @@ import java.util.UUID;
 @AllArgsConstructor()
 public abstract class SpriteEntity extends DrawableEntity {
     @Getter
-    private final int x, y;
+    protected int x, y;
 
     @Getter
     private final Sprite appearance;
