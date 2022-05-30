@@ -1,7 +1,14 @@
 package com.catfisher.multiarielle;
 
 import com.catfisher.multiarielle.clientServer.ModelServer;
+import com.catfisher.multiarielle.controller.AiController;
 import com.catfisher.multiarielle.controller.ServerController;
+import com.catfisher.multiarielle.entity.RandomWalkEntity;
+import com.catfisher.multiarielle.entity.SearchingEntity;
+import com.catfisher.multiarielle.entity.SpriteEntity;
+import com.catfisher.multiarielle.entity.StaticSprite;
+import com.catfisher.multiarielle.model.Chunk;
+import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.worldgen.EmptyWorldGenerator;
 import com.catfisher.multiarielle.worldgen.FileWorldGenerator;
 import com.catfisher.multiarielle.worldgen.NoiseWorldGenerator;
@@ -39,20 +46,17 @@ public class Server {
             }
         }).start();
 
-        new Thread(() -> {
-            long time;
-            while (true) {
-                time = System.currentTimeMillis();
-                server.getTrueModel().update();
-                try {
-                    Thread.sleep(1000 / 60 - (System.currentTimeMillis() - time));
-                } catch (InterruptedException e) {
-                    log.error("Interrupted while sleeping ", e);
-                }
-            }
-        }).start();
+        Thread serverThread = new Thread(serverController);
+        serverThread.start();
 
-        serverController.run();
+        AiController aiController = new AiController(server);
+        new Thread(aiController).start();
+
+        SpriteEntity testEntity = new SearchingEntity(5, 5, Sprite.VILLAGER);
+        server.getTrueModel().getMap().get(Chunk.Address.ofAbsoluteCoords(testEntity.getX(), testEntity.getY())).getEntities().put(testEntity.getId(), testEntity);
+        aiController.registerWaiter(testEntity, 1000);
+
+        serverThread.join();
     }
 
     private static Options getOptions() {

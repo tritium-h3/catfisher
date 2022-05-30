@@ -45,22 +45,32 @@ public class AiController implements Runnable {
                 QueuedCall nextWakeup;
                 synchronized (wakeupQueue) {
                     try {
+                        log.debug("Pending next waiter");
                         nextWakeup = wakeupQueue.remove();
                     } catch (NoSuchElementException exn) {
                         Thread.sleep(10);
                         continue;
                     }
                 }
+                log.debug("Woke up {}", nextWakeup);
                 while (nextWakeup.wakeupTimeMillis > System.currentTimeMillis()) {
-                    Thread.currentThread().sleep(nextWakeup.getWakeupTimeMillis() - System.currentTimeMillis());
+                    long preWaitTime = System.currentTimeMillis();
+                    if (nextWakeup.wakeupTimeMillis > preWaitTime) {
+                        log.debug("Waiting {} to resume", nextWakeup.wakeupTimeMillis - preWaitTime);
+                        Thread.currentThread().sleep(nextWakeup.getWakeupTimeMillis() - preWaitTime);
+                    }
                 }
                 long pretendCurrentTime = nextWakeup.getWakeupTimeMillis();
                 Entity entityToCall = nextWakeup.getEntityToCall();
                 long period = nextWakeup.getPeriod();
                 EntityChangeDelta delta = (entityToCall.update(model.getTrueModel()));
-                model.applyDelta(delta);
+                if (delta != null) {
+                    model.applyDelta(delta);
+                }
                 synchronized (wakeupQueue) {
-                    wakeupQueue.add(new QueuedCall(entityToCall, pretendCurrentTime + period, period));
+                    QueuedCall nextQueue = new QueuedCall(entityToCall, pretendCurrentTime + period, period);
+                    log.debug("Enqueuing {}", nextQueue);
+                    wakeupQueue.add(nextQueue);
                 }
             }
         } catch (InterruptedException exn) {
