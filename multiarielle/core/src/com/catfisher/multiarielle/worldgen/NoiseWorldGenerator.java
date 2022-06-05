@@ -2,9 +2,9 @@ package com.catfisher.multiarielle.worldgen;
 
 import com.catfisher.multiarielle.model.BackgroundTile;
 import com.catfisher.multiarielle.model.Chunk;
+import com.catfisher.multiarielle.model.ForegroundTile;
 import lombok.extern.log4j.Log4j2;
 import org.spongepowered.noise.NoiseQuality;
-import org.spongepowered.noise.module.NoiseModule;
 import org.spongepowered.noise.module.source.Perlin;
 
 import java.util.Random;
@@ -33,9 +33,10 @@ public class NoiseWorldGenerator implements WorldGenerator {
                 double x = address.getMinAbsX() + i;
                 double y = address.getMinAbsY() + j;
                 double hmap = noise.get(x, y, 500.0);
-                builder.insertTile(i, j, hmap < SEA_LEVEL ? BackgroundTile.WATER : BackgroundTile.GRASS);
+                builder.insertBgTile(i, j, hmap < SEA_LEVEL ? BackgroundTile.WATER : BackgroundTile.GRASS);
             }
         }
+        builder.insertFgTile(3, 3, ForegroundTile.WALL);
         return builder.build();
     }
 }

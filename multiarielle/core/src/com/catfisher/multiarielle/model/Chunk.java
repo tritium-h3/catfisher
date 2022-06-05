@@ -1,15 +1,11 @@
 package com.catfisher.multiarielle.model;
 
-import com.badlogic.gdx.math.Vector2;
 import com.catfisher.multiarielle.entity.Entity;
-import com.catfisher.multiarielle.entity.StaticSprite;
-import com.catfisher.multiarielle.sprite.Sprite;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializers;
 import com.fasterxml.jackson.databind.ser.std.StdKeySerializers;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
@@ -17,9 +13,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Log4j2
@@ -31,6 +24,8 @@ public class Chunk {
 
     @Getter
     private BackgroundTile[][] bgLayer;
+    @Getter
+    private ForegroundTile[][] fgLayer;
     @Getter
     private Map<String, Entity> entities;
 
@@ -55,14 +50,16 @@ public class Chunk {
         int loadedXSize = loadedOrientation.length;
 
         background = new BackgroundTile[loadedYSize][loadedXSize];
+        ForegroundTile[][] foreground = new ForegroundTile[loadedXSize][loadedYSize];
 
         for (int x = 0; x < loadedYSize; x++) {
             for (int y = 0; y < loadedXSize; y++) {
                 background[x][y] = loadedOrientation[loadedXSize-y-1][x];
+                foreground[x][y] = ForegroundTile.EMPTY;
             }
         }
 
-        return new Chunk(background, new HashMap<>());
+        return new Chunk(background, foreground, new HashMap<>());
     }
 
     @Data
@@ -108,16 +105,32 @@ public class Chunk {
     }
 
     public static class Builder {
-        BackgroundTile[][] accumulator = new BackgroundTile[SIZE_X][SIZE_Y];
+        BackgroundTile[][] bgAccumulator = new BackgroundTile[SIZE_X][SIZE_Y];
+        ForegroundTile[][] fgAccumulator = new ForegroundTile[SIZE_X][SIZE_Y];
 
-        public Builder insertTile(int x, int y, BackgroundTile tile) {
-            accumulator[x][y] = tile;
+        public Builder insertBgTile(int x, int y, BackgroundTile tile) {
+            bgAccumulator[x][y] = tile;
+            return this;
+        }
+
+        public Builder insertFgTile(int x, int y, ForegroundTile tile) {
+            fgAccumulator[x][y] = tile;
             return this;
         }
 
         public Chunk build() {
             Map<String, Entity> entities = new HashMap<>();
-            return new Chunk(accumulator, entities);
+            for (int x = 0; x < SIZE_X; x++) {
+                for (int y = 0; y < SIZE_Y; y++) {
+                    if (bgAccumulator[x][y] == null) {
+                        bgAccumulator[x][y] = BackgroundTile.EMPTY;
+                    }
+                    if (fgAccumulator[x][y] == null) {
+                        fgAccumulator[x][y] = ForegroundTile.EMPTY;
+                    }
+                }
+            }
+            return new Chunk(bgAccumulator, fgAccumulator, entities);
         }
     }
 

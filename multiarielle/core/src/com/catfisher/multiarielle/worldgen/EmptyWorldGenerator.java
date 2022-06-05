@@ -12,7 +12,7 @@ public class EmptyWorldGenerator implements WorldGenerator {
 
         for (int i = 0; i < Chunk.SIZE_X; i++) {
             for (int j = 0; j < Chunk.SIZE_Y; j++) {
-                builder.insertTile(i, j, BackgroundTile.GRASS);
+                builder.insertBgTile(i, j, BackgroundTile.GRASS);
             }
         }
         return builder.build();

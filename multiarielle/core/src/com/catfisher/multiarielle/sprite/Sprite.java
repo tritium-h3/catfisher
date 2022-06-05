@@ -14,7 +14,9 @@ public enum Sprite {
     HERO(Spritesheet.HERO_SPRITESHEET_NAME, 0, 0),
     TOUCAN(Spritesheet.TOUCAN_SPRITESHEET_NAME, 0, 0),
     VILLAGER(Spritesheet.VILLAGER_SPRITESHEET_NAME, 0, 0),
-    VILLAIN(Spritesheet.VILLAIN_SPRITESHEET_NAME, 0, 0);
+    VILLAIN(Spritesheet.VILLAIN_SPRITESHEET_NAME, 0, 0),
+
+    WALL(Spritesheet.INDOOR_SPRITESHEET_NAME, 2, 5);
 
     private String sheetName;
     private int sheetX;

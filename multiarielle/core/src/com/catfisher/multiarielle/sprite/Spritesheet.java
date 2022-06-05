@@ -9,4 +9,5 @@ public class Spritesheet {
     public static final String TOUCAN_SPRITESHEET_NAME = "Toucan 01 32.png";
     public static final String VILLAGER_SPRITESHEET_NAME = "Villager 02 32.png";
     public static final String VILLAIN_SPRITESHEET_NAME = "Villain 03 32.png";
+    public static final String INDOOR_SPRITESHEET_NAME = "indoor.png";
 }

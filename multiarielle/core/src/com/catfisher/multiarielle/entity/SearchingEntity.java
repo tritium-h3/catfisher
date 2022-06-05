@@ -57,10 +57,6 @@ public class SearchingEntity extends MovingEntity {
             this.newY = currentY;
             this.score = heuristicScore(startX, startY, currentX, currentY, endX, endY);
         }
-
-        /* public boolean equals(PathElement other) {
-            return newX == other.getNewX() && newY == other.getNewY();
-        } */
     }
 
     private List<PathElement> currentPath = new ArrayList<>();

@@ -55,6 +55,8 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
                         toReturn[x-startX][y-startY] = new ArrayList<>();
                         toReturn[x - startX][y - startY].add(getMap().get(chunkAddress).
                                 getBgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].getAppearance());
+                        toReturn[x - startX][y - startY].add(getMap().get(chunkAddress).
+                                getFgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].getAppearance());
                     }
                 }
             }
@@ -98,10 +100,12 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
                     }
 
                     BackgroundTile[][] bgLayer = getMap().get(newAddress).getBgLayer();
+                    ForegroundTile[][] fgLayer = getMap().get(newAddress).getFgLayer();
 
                     Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(newX, newY);
                     if ((bgLayer[chunkOffset.getLeft()][chunkOffset.getRight()] == null) ||
-                            (bgLayer[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible())) {
+                            (bgLayer[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible()) ||
+                            (fgLayer[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible())) {
                         return false;
                     } else {
                         p.setX(newX);
@@ -152,7 +156,8 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
         Chunk chunk = getMap().get(addr);
         if (chunk == null) return true;
         Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(x, y);
-        return chunk.getBgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible();
+        return (chunk.getBgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible() ||
+                chunk.getFgLayer()[chunkOffset.getLeft()][chunkOffset.getRight()].isImpassible());
     }
 
     @Override
