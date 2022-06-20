@@ -16,6 +16,8 @@ public enum Sprite {
     VILLAGER(Spritesheet.VILLAGER_SPRITESHEET_NAME, 0, 0),
     VILLAIN(Spritesheet.VILLAIN_SPRITESHEET_NAME, 0, 0),
 
+    SELECTOR(Spritesheet.SELECTOR_SPRITESHEET_NAME, 0, 0),
+
     WALL(Spritesheet.INDOOR_SPRITESHEET_NAME, 2, 5);
 
     private String sheetName;

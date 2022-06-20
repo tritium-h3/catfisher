@@ -6,25 +6,16 @@ import com.catfisher.multiarielle.ChatHandler;
 import com.catfisher.multiarielle.controller.delta.Delta;
 import com.catfisher.multiarielle.controller.delta.CharacterMoveDelta;
 import com.catfisher.multiarielle.model.Character;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 public class KeyboardController implements InputProcessor {
     private final Character hero;
-    private final DeltaConsumer consumer;
+    private final UiController uiController;
     private final ChatHandler chatHandler;
-    private final Map<Integer, Delta> keyMap = new HashMap<>();
-
-    public KeyboardController(Character hero, DeltaConsumer consumer, ChatHandler chatHandler) {
-        this.hero = hero;
-        this.consumer = consumer;
-        this.chatHandler = chatHandler;
-        keyMap.put(Input.Keys.UP, new CharacterMoveDelta(hero, 0, 1));
-        keyMap.put(Input.Keys.DOWN, new CharacterMoveDelta(hero, 0, -1));
-        keyMap.put(Input.Keys.RIGHT, new CharacterMoveDelta(hero, 1, 0));
-        keyMap.put(Input.Keys.LEFT, new CharacterMoveDelta(hero, -1, 0));
-    }
 
     @Override
     public boolean keyUp(int keycode) {
@@ -46,13 +37,13 @@ public class KeyboardController implements InputProcessor {
             }
             return false;
         }
-        Delta delta = keyMap.get(keycode);
-        if (null == delta) {
-            return true;
-        } else {
-            consumer.consume(delta);
-            return true;
+        switch (keycode) {
+            case Input.Keys.UP: return uiController.moveCharacter(hero, 0, 1);
+            case Input.Keys.DOWN: return uiController.moveCharacter(hero, 0, -1);
+            case Input.Keys.RIGHT: return uiController.moveCharacter(hero, 1, 0);
+            case Input.Keys.LEFT: return uiController.moveCharacter(hero, -1, 0);
         }
+        return false;
     }
 
     @Override
@@ -77,7 +68,8 @@ public class KeyboardController implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        return false;
+        uiController.moveCursor(screenX, screenY);
+        return true;
     }
 
     @Override

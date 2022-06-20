@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.catfisher.multiarielle.clientServer.ModelClient;
 import com.catfisher.multiarielle.clientServer.ProxyServer;
+import com.catfisher.multiarielle.controller.UiController;
 import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
 import com.catfisher.multiarielle.controller.KeyboardController;
 import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
@@ -126,7 +127,8 @@ public class MultiArielle extends Game {
 		LocalScreen screen = new LocalScreen(this);
 		client.setMessageHolder(screen.getMessageHolder());
 		ChatHandler chatHandler = new ChatHandler(screen.getMessageHolder(), client);
-		keyboardController = new KeyboardController(hero, localModel, chatHandler);
+		UiController uiController = new UiController(localModel, screen);
+		keyboardController = new KeyboardController(hero, uiController, chatHandler);
 
 		InputMultiplexer multiplexer = new InputMultiplexer(keyboardController, screen.getStage());
 

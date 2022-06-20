@@ -9,12 +9,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.catfisher.multiarielle.coordinates.AbsoluteCoordinate;
+import com.catfisher.multiarielle.coordinates.ScreenCoordinate;
+import com.catfisher.multiarielle.coordinates.TileCoordinate;
 import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.LocalModel;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.catfisher.multiarielle.sprite.SpriteAtlas;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
@@ -38,6 +42,8 @@ public class LocalScreen implements Screen {
     private TextField messageArea;
     private ServerTextArea serverTextArea;
     private Table layoutTable;
+
+    private ScreenCoordinate cursor = new ScreenCoordinate(0, 0, 0, 0);
 
     private static class ServerTextArea {
         private final Label[] labelBox;
@@ -98,6 +104,14 @@ public class LocalScreen implements Screen {
         this.camera = new OrthographicCamera(640, 360);
     }
 
+    public void setCursor(int x, int y) {
+        synchronized (cursor) {
+            cursor = new ScreenCoordinate(x / 2, y / 2,
+                    (int) (camera.position.x - (camera.viewportWidth / 2)),
+                    (int) (camera.position.y + (camera.viewportHeight / 2)));
+        }
+    }
+
     public MessageHolder getMessageHolder() {
         return new MessageHolder() {
             @Override
@@ -150,6 +164,11 @@ public class LocalScreen implements Screen {
             if (camera.position.x != mp.getX() * 32 || camera.position.y != mp.getY() * 32) {
                 camera.position.x += ((mp.getX() * 32 - camera.position.x) / 4);
                 camera.position.y += ((mp.getY() * 32 - camera.position.y) / 4);
+                synchronized (cursor) {
+                    cursor = new ScreenCoordinate(cursor.getX(), cursor.getY(),
+                            (int) (camera.position.x - (camera.viewportWidth / 2)),
+                            (int) (camera.position.y + (camera.viewportHeight / 2)));
+                }
                 camera.update();
             }
         }
@@ -158,18 +177,24 @@ public class LocalScreen implements Screen {
         stage.getBatch().begin();
 
         int range = 12;
-        int playerX = mp.getX();
-        int playerY = mp.getY();
-        int startX = playerX - range;
-        int startY = playerY - range;
-        int endX = playerX + range;
-        int endY = playerY + range;
+        TileCoordinate playerCoords = new TileCoordinate(mp.getX(), mp.getY());
+        int startX = playerCoords.getX() - range;
+        int startY = playerCoords.getY() - range;
+        int endX = playerCoords.getX() + range;
+        int endY = playerCoords.getY() + range;
         List<Sprite>[][] placements = localModel.getSpritePlacements(startX, startY, endX, endY);
         for (int x = startX; x < endX; x++) {
             for (int y = startY; y < endY; y++) {
                 for (Sprite sprite : placements[x - startX][y - startY]) {
                     stage.getBatch().draw(atlas.getTextureRegion(sprite), x * 32, y * 32);
                 }
+            }
+        }
+
+        synchronized (cursor) {
+            AbsoluteCoordinate displayCursorCoord = cursor.toTile().toAbsolute();
+            if (displayCursorCoord.toTile().distanceTo(playerCoords) <= 3) {
+                stage.getBatch().draw(atlas.getTextureRegion(Sprite.SELECTOR), displayCursorCoord.getX(), displayCursorCoord.getY());
             }
         }
 

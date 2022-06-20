@@ -10,4 +10,5 @@ public class Spritesheet {
     public static final String VILLAGER_SPRITESHEET_NAME = "Villager 02 32.png";
     public static final String VILLAIN_SPRITESHEET_NAME = "Villain 03 32.png";
     public static final String INDOOR_SPRITESHEET_NAME = "indoor.png";
+    public static final String SELECTOR_SPRITESHEET_NAME = "selector.png";
 }
