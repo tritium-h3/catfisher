@@ -178,15 +178,14 @@ public class LocalScreen implements Screen {
 
         int range = 12;
         TileCoordinate playerCoords = new TileCoordinate(mp.getX(), mp.getY());
-        int startX = playerCoords.getX() - range;
-        int startY = playerCoords.getY() - range;
-        int endX = playerCoords.getX() + range;
-        int endY = playerCoords.getY() + range;
-        List<Sprite>[][] placements = localModel.getSpritePlacements(startX, startY, endX, endY);
-        for (int x = startX; x < endX; x++) {
-            for (int y = startY; y < endY; y++) {
-                for (Sprite sprite : placements[x - startX][y - startY]) {
-                    stage.getBatch().draw(atlas.getTextureRegion(sprite), x * 32, y * 32);
+        TileCoordinate start = new TileCoordinate(playerCoords.getX() - range, playerCoords.getY() - range);
+        TileCoordinate end = new TileCoordinate(playerCoords.getX() + range, playerCoords.getY() + range);
+        List<Sprite>[][] placements = localModel.getSpritePlacements(start.getX(), start.getY(), end.getX(), end.getY());
+        for (int x = start.getX(); x < end.getX(); x++) {
+            for (int y = start.getY(); y < end.getY(); y++) {
+                AbsoluteCoordinate absCoord = new TileCoordinate(x, y).toAbsolute();
+                for (Sprite sprite : placements[x - start.getX()][y - start.getY()]) {
+                    stage.getBatch().draw(atlas.getTextureRegion(sprite), absCoord.getX(), absCoord.getY());
                 }
             }
         }
