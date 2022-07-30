@@ -143,12 +143,7 @@ public class LocalScreen implements Screen {
     public void show() {
     }
 
-    @Override
-    public void render(float delta) {
-        stage.draw();
-
-        ScreenUtils.clear(Color.BLACK);
-
+    public TileCoordinate playerCoordinates() {
         AbstractModel.MutablePlacement mp = null;
 
         for (AbstractModel.MutablePlacement i :  localModel.getLocalModel().getAllCharacters()) {
@@ -156,15 +151,29 @@ public class LocalScreen implements Screen {
                 mp = i;
             }
         }
-
         if (mp == null) {
+            return null;
+        } else {
+            return new TileCoordinate(mp.getX(), mp.getY());
+        }
+
+    }
+
+    @Override
+    public void render(float delta) {
+        stage.draw();
+
+        ScreenUtils.clear(Color.BLACK);
+
+        TileCoordinate playerCoords = playerCoordinates();
+        if (playerCoords == null) {
             log.error("Didn't find character, character should exist");
         }
         else {
             // TODO: Get rid of magic numbers
-            if (camera.position.x != mp.getX() * 32 || camera.position.y != mp.getY() * 32) {
-                camera.position.x += ((mp.getX() * 32 - camera.position.x) / 4);
-                camera.position.y += ((mp.getY() * 32 - camera.position.y) / 4);
+            if (camera.position.x != playerCoords.getX() * 32 || camera.position.y != playerCoords.getY() * 32) {
+                camera.position.x += ((playerCoords.getX() * 32 - camera.position.x) / 4);
+                camera.position.y += ((playerCoords.getY() * 32 - camera.position.y) / 4);
                 synchronized (cursor) {
                     cursor = new ScreenCoordinate(cursor.getX(), cursor.getY(),
                             (int) (camera.position.x - (camera.viewportWidth / 2)),
@@ -178,7 +187,6 @@ public class LocalScreen implements Screen {
         stage.getBatch().begin();
 
         int range = 12;
-        TileCoordinate playerCoords = new TileCoordinate(mp.getX(), mp.getY());
         TileCoordinate start = new TileCoordinate(playerCoords.getX() - range, playerCoords.getY() - range);
         TileCoordinate end = new TileCoordinate(playerCoords.getX() + range, playerCoords.getY() + range);
         List<Sprite>[][] placements = localModel.getSpritePlacements(start.getX(), start.getY(), end.getX(), end.getY());
@@ -192,8 +200,8 @@ public class LocalScreen implements Screen {
         }
 
         synchronized (cursor) {
-            AbsoluteCoordinate displayCursorCoord = cursor.toTile().toAbsolute();
-            if (displayCursorCoord.toTile().distanceTo(playerCoords) <= 3) {
+            if (isCursorCloseToPlayer(playerCoords)) {
+                AbsoluteCoordinate displayCursorCoord = cursor.toTile().toAbsolute();
                 stage.getBatch().draw(atlas.getTextureRegion(Sprite.SELECTOR), displayCursorCoord.getX(), displayCursorCoord.getY());
             }
         }
@@ -204,6 +212,10 @@ public class LocalScreen implements Screen {
 
     }
 
+    public boolean isCursorCloseToPlayer(TileCoordinate playerCoordinates) {
+        AbsoluteCoordinate displayCursorCoord = cursor.toTile().toAbsolute();
+        return displayCursorCoord.toTile().distanceTo(playerCoordinates) <= 3;
+    }
 
     @Override
     public void resize(int width, int height) {
