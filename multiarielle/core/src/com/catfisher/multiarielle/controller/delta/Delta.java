@@ -14,7 +14,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = CharacterRemoveDelta.class, name = "CharacterRemoveDelta"),
         @JsonSubTypes.Type(value = CharacterMoveDelta.class, name = "CharacterMoveDelta"),
         @JsonSubTypes.Type(value = EntityChangeDelta.class, name = "EntityChangeDelta"),
-        @JsonSubTypes.Type(value = SynchronizeEvent.class, name = "SynchronizeDelta")
+        @JsonSubTypes.Type(value = SynchronizeEvent.class, name = "SynchronizeDelta"),
+        @JsonSubTypes.Type(value = TileChangeDelta.class, name = "TileChangeDelta")
 })
 public abstract class Delta {
     public abstract <Response> Response accept(DeltaVisitor<Response> v);

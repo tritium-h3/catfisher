@@ -7,4 +7,5 @@ public interface DeltaVisitor<Response> {
     Response visit(CharacterAddDelta e);
     Response visit(CharacterRemoveDelta characterRemoveEvent);
     Response visit(EntityChangeDelta entityChangeDelta);
+    Response visit(TileChangeDelta tileChangeDelta);
 }

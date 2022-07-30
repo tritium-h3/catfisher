@@ -1,21 +1,17 @@
 package com.catfisher.multiarielle.entity;
 
 import com.catfisher.multiarielle.controller.delta.EntityChangeDelta;
+import com.catfisher.multiarielle.coordinates.TileCoordinate;
 import com.catfisher.multiarielle.model.AbstractModel;
-import com.catfisher.multiarielle.model.Character;
 import com.catfisher.multiarielle.model.Chunk;
 import com.catfisher.multiarielle.sprite.Sprite;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.spongepowered.noise.module.modifier.Abs;
 
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,12 +68,13 @@ public class SearchingEntity extends MovingEntity {
                 currentPath = pathfind(abstractModel);
             }
             if (currentPath.isEmpty()) {
-                return new EntityChangeDelta(getId(), Chunk.Address.ofAbsoluteCoords(x, y), objectMapper.writeValueAsString(new WalkDelta(x, y)));
+                return new EntityChangeDelta(getId(), Chunk.Address.ofTileCoords(new TileCoordinate(x, y)),
+                        objectMapper.writeValueAsString(new WalkDelta(x, y)));
             }
             PathElement nextStep = currentPath.remove(0);
             return new EntityChangeDelta(
                     getId(),
-                    Chunk.Address.ofAbsoluteCoords(x, y),
+                    Chunk.Address.ofTileCoords(new TileCoordinate(x, y)),
                     objectMapper.writeValueAsString(new WalkDelta(nextStep.getNewX(), nextStep.getNewY()))
             );
         } catch (JsonProcessingException exn) {

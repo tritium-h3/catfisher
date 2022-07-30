@@ -1,5 +1,6 @@
 package com.catfisher.multiarielle.model;
 
+import com.catfisher.multiarielle.coordinates.TileCoordinate;
 import com.catfisher.multiarielle.entity.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -69,8 +70,8 @@ public class Chunk {
         int x;
         int y;
 
-        public static Address ofAbsoluteCoords(int absX, int absY) {
-            return new Address(Math.floorDiv(absX, SIZE_X), Math.floorDiv(absY, SIZE_Y));
+        public static Address ofTileCoords(TileCoordinate coordinates) {
+            return new Address(Math.floorDiv(coordinates.getX(), SIZE_X), Math.floorDiv(coordinates.getY(), SIZE_Y));
         }
 
         @JsonIgnore
@@ -83,8 +84,20 @@ public class Chunk {
             return y * SIZE_Y;
         }
 
+        public static int getOffsetX(TileCoordinate coordinate) {
+            return Math.floorMod(coordinate.getX(), SIZE_X);
+        }
+
+        public static int getOffsetY(TileCoordinate coordinate) {
+            return Math.floorMod(coordinate.getY(), SIZE_Y);
+        }
+
+        public static Pair<Integer, Integer> getOffset(TileCoordinate coordinate) {
+            return Pair.of(getOffsetX(coordinate), getOffsetY(coordinate));
+        }
+
         public static Pair<Integer, Integer> getOffset(int absX, int absY) {
-            return new ImmutablePair<>(Math.floorMod(absX, SIZE_X), Math.floorMod(absY, SIZE_Y));
+            return getOffset(new TileCoordinate(absX, absY));
         }
 
         public static class KeySer extends StdKeySerializers.StringKeySerializer {

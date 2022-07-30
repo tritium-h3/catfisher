@@ -2,6 +2,7 @@ package com.catfisher.multiarielle.model;
 
 import com.catfisher.multiarielle.controller.*;
 import com.catfisher.multiarielle.controller.delta.*;
+import com.catfisher.multiarielle.coordinates.TileCoordinate;
 import com.catfisher.multiarielle.entity.DrawableEntity;
 import com.catfisher.multiarielle.entity.Entity;
 import com.catfisher.multiarielle.sprite.Sprite;
@@ -45,7 +46,7 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
         synchronized (this) {
             for (int x = startX; x < endX; x++) {
                 for (int y = startY; y < endY; y++) {
-                    Chunk.Address chunkAddress = Chunk.Address.ofAbsoluteCoords(x, y);
+                    Chunk.Address chunkAddress = Chunk.Address.ofTileCoords(new TileCoordinate(x, y));
                     Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(x, y);
                     Chunk chunk = getMap().get(chunkAddress);
                     if  (chunk == null) {
@@ -94,7 +95,7 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
                     int newX = p.getX() + e.getDeltaX();
                     int newY = p.getY() + e.getDeltaY();
 
-                    Chunk.Address newAddress = Chunk.Address.ofAbsoluteCoords(newX, newY);
+                    Chunk.Address newAddress = Chunk.Address.ofTileCoords(new TileCoordinate(newX, newY));
                     if (getMap().get(newAddress) == null) {
                         return false;
                     }
@@ -140,6 +141,19 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
         return true;
     }
 
+    @Override
+    public Boolean visit(TileChangeDelta tileChangeDelta) {
+        Chunk theChunk = getMap().get(Chunk.Address.ofTileCoords(
+                new TileCoordinate(
+                    tileChangeDelta.getCoordinatees().getX(),
+                    tileChangeDelta.getCoordinatees().getY())));
+        theChunk.getFgLayer()
+                [Chunk.Address.getOffsetX(tileChangeDelta.getCoordinatees())]
+                [Chunk.Address.getOffsetY(tileChangeDelta.getCoordinatees())]
+                = tileChangeDelta.getTile();
+        return true;
+    }
+
     public void moveEntityToChunk(Entity entity, Chunk.Address oldChunk, Chunk.Address newChunk) {
         Chunk fromChunk = getMap().get(oldChunk);
         if (fromChunk != null) {
@@ -152,7 +166,7 @@ public abstract class AbstractModel implements Model, DeltaVisitor<Boolean>, Del
     }
 
     public boolean isImpassable(int x, int y) {
-        Chunk.Address addr = Chunk.Address.ofAbsoluteCoords(x, y);
+        Chunk.Address addr = Chunk.Address.ofTileCoords(new TileCoordinate(x, y));
         Chunk chunk = getMap().get(addr);
         if (chunk == null) return true;
         Pair<Integer, Integer> chunkOffset = Chunk.Address.getOffset(x, y);

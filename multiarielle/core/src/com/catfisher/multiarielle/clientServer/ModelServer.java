@@ -5,6 +5,7 @@ import com.catfisher.multiarielle.clientServer.event.server.*;
 import com.catfisher.multiarielle.controller.delta.CharacterAddDelta;
 import com.catfisher.multiarielle.controller.delta.CharacterRemoveDelta;
 import com.catfisher.multiarielle.controller.delta.Delta;
+import com.catfisher.multiarielle.coordinates.TileCoordinate;
 import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.Character;
 import com.catfisher.multiarielle.model.Chunk;
@@ -15,7 +16,6 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,11 +100,11 @@ public class ModelServer implements ClientEventVisitor<Boolean> {
         if (clientCharacter != null) {
             for (AbstractModel.MutablePlacement placement : trueModel.getAllCharacters()) {
                 if (placement.getCharacter().getName().equals(clientCharacter.getName())) {
-                    return Chunk.Address.ofAbsoluteCoords(placement.getX(), placement.getY());
+                    return Chunk.Address.ofTileCoords(new TileCoordinate(placement.getX(), placement.getY()));
                 }
             }
         }
-        return Chunk.Address.ofAbsoluteCoords(0, 0);
+        return Chunk.Address.ofTileCoords(new TileCoordinate(0, 0));
     }
 
     private SynchronizeEvent generateSynchronizeEventForClient(ProxyClient client) {

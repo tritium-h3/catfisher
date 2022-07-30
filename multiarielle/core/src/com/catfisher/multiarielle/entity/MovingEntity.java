@@ -1,5 +1,6 @@
 package com.catfisher.multiarielle.entity;
 
+import com.catfisher.multiarielle.coordinates.TileCoordinate;
 import com.catfisher.multiarielle.model.AbstractModel;
 import com.catfisher.multiarielle.model.Chunk;
 import com.catfisher.multiarielle.sprite.Sprite;
@@ -10,8 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
-
-import java.util.Random;
 
 @Log4j2
 public abstract class MovingEntity extends SpriteEntity {
@@ -36,10 +35,10 @@ public abstract class MovingEntity extends SpriteEntity {
     public void acceptUpdate(String update, AbstractModel abstractModel) {
         try {
             WalkDelta delta = objectMapper.readValue(update, WalkDelta.class);
-            Chunk.Address oldChunk = Chunk.Address.ofAbsoluteCoords(x, y);
+            Chunk.Address oldChunk = Chunk.Address.ofTileCoords(new TileCoordinate(x, y));
             x = delta.getNewX();
             y = delta.getNewY();
-            Chunk.Address newChunk = Chunk.Address.ofAbsoluteCoords(x, y);
+            Chunk.Address newChunk = Chunk.Address.ofTileCoords(new TileCoordinate(x, y));
             if (!oldChunk.equals(newChunk)) {
                 abstractModel.moveEntityToChunk(this, oldChunk, newChunk);
             }

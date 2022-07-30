@@ -3,21 +3,14 @@ package com.catfisher.multiarielle;
 import com.catfisher.multiarielle.clientServer.ModelServer;
 import com.catfisher.multiarielle.controller.AiController;
 import com.catfisher.multiarielle.controller.ServerController;
-import com.catfisher.multiarielle.entity.RandomWalkEntity;
+import com.catfisher.multiarielle.coordinates.TileCoordinate;
 import com.catfisher.multiarielle.entity.SearchingEntity;
 import com.catfisher.multiarielle.entity.SpriteEntity;
-import com.catfisher.multiarielle.entity.StaticSprite;
 import com.catfisher.multiarielle.model.Chunk;
 import com.catfisher.multiarielle.sprite.Sprite;
-import com.catfisher.multiarielle.worldgen.EmptyWorldGenerator;
-import com.catfisher.multiarielle.worldgen.FileWorldGenerator;
 import com.catfisher.multiarielle.worldgen.NoiseWorldGenerator;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.cli.*;
-
-import java.util.Scanner;
 
 @Log4j2
 public class Server {
@@ -53,7 +46,7 @@ public class Server {
         new Thread(aiController).start();
 
         SpriteEntity testEntity = new SearchingEntity(5, 5, Sprite.VILLAGER);
-        server.getTrueModel().getMap().get(Chunk.Address.ofAbsoluteCoords(testEntity.getX(), testEntity.getY())).getEntities().put(testEntity.getId(), testEntity);
+        server.getTrueModel().getMap().get(Chunk.Address.ofTileCoords(new TileCoordinate(testEntity.getX(), testEntity.getY()))).getEntities().put(testEntity.getId(), testEntity);
         aiController.registerWaiter(testEntity, 1000);
 
         serverThread.join();

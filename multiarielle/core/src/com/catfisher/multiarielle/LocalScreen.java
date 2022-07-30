@@ -43,6 +43,7 @@ public class LocalScreen implements Screen {
     private ServerTextArea serverTextArea;
     private Table layoutTable;
 
+    @Getter
     private ScreenCoordinate cursor = new ScreenCoordinate(0, 0, 0, 0);
 
     private static class ServerTextArea {
