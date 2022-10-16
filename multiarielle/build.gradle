@@ -87,6 +87,10 @@ project(":core") {
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+
+        testImplementation(platform('org.junit:junit-bom:5.9.1'))
+        testImplementation('org.junit.jupiter:junit-jupiter')
+
         implementation 'org.apache.commons:commons-collections4:4.4'
         implementation 'commons-cli:commons-cli:1.4'
         implementation 'org.apache.commons:commons-lang3:3.0'
@@ -100,5 +104,11 @@ project(":core") {
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
         implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2'
         implementation "org.spongepowered:noise:2.0.0-SNAPSHOT"
+    }
+
+    test {
+        useJUnitPlatform()
+
+        maxHeapSize = '1G'
     }
 }
